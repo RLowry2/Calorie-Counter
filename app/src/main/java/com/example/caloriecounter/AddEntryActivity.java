@@ -1,0 +1,64 @@
+package com.example.caloriecounter;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+public class AddEntryActivity extends AppCompatActivity {
+
+    private EditText foodNameEditText, foodCaloriesEditText;
+    private Button saveButton;
+    private FoodDatabaseHelper dbHelper;
+    private String selectedDate;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add_entry);
+
+        // Get date from intent, or default to today
+        selectedDate = getIntent().getStringExtra("selectedDate");
+        if (selectedDate == null) {
+            selectedDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        }
+
+        foodNameEditText = findViewById(R.id.foodNameEditText);
+        foodCaloriesEditText = findViewById(R.id.foodCaloriesEditText);
+        saveButton = findViewById(R.id.saveButton);
+
+        dbHelper = new FoodDatabaseHelper(this); // Initialize the database helper
+
+        saveButton.setOnClickListener(v -> saveFoodEntry());
+    }
+
+    // In AddEntryActivity.java
+    private void saveFoodEntry() {
+        String foodName = foodNameEditText.getText().toString();
+        String foodCaloriesStr = foodCaloriesEditText.getText().toString();
+
+        if (!foodName.isEmpty() && !foodCaloriesStr.isEmpty()) {
+            int foodCalories = Integer.parseInt(foodCaloriesStr);
+
+            // Insert the food entry into the database
+            dbHelper.insertFood(foodName, foodCalories, selectedDate);
+
+            // Return to the CalendarActivity after saving
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("selectedDate", selectedDate);  // Send the selected date back
+            setResult(RESULT_OK, resultIntent);
+            finish();  // Close the activity
+        } else {
+            Toast.makeText(this, "Please fill in both fields", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+}
