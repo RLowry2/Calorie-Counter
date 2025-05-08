@@ -86,19 +86,19 @@ public class CalendarActivity extends AppCompatActivity {
 
     private void showPopupMenu(View anchor) {
         PopupMenu popup = new PopupMenu(this, anchor);
-        popup.getMenu().add(0, 1, 0, "Edit Goal");
-        popup.getMenu().add(0, 2, 1, "Add Entry");
+        popup.getMenu().add(0, 1, 0, "Add Entry");
+        popup.getMenu().add(0, 2, 1, "Edit Goal");
 
         popup.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == 1) {
-                Intent i1 = new Intent(this, SetGoalActivity.class);
+                Intent i1 = new Intent(this, AddEntryActivity.class);
                 i1.putExtra("selectedDate", selectedDate);
-                setGoalLauncher.launch(i1);
+                addEntryLauncher.launch(i1);
                 return true;
             } else if (item.getItemId() == 2) {
-                Intent i2 = new Intent(this, AddEntryActivity.class);
+                Intent i2 = new Intent(this, SetGoalActivity.class);
                 i2.putExtra("selectedDate", selectedDate);
-                addEntryLauncher.launch(i2);
+                setGoalLauncher.launch(i2);
                 return true;
             }
             return false;
@@ -120,11 +120,15 @@ public class CalendarActivity extends AppCompatActivity {
 
         if (goal > 0) {
             double pct = (double) total / goal;
-            if (pct > 1)        totalCaloriesText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            else if (pct >= .7) totalCaloriesText.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
-            else                totalCaloriesText.setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
+            totalCaloriesText.setTextColor(getColorForPercentage(pct));
         }
 
         adapter.updateFoodList(foodList);
+    }
+
+    private int getColorForPercentage(double percentage) {
+        if (percentage > 1) return getResources().getColor(android.R.color.holo_red_dark);
+        if (percentage >= .7) return getResources().getColor(android.R.color.holo_green_dark);
+        return getResources().getColor(android.R.color.holo_orange_dark);
     }
 }

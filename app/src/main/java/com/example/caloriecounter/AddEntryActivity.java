@@ -44,7 +44,7 @@ public class AddEntryActivity extends AppCompatActivity {
         String foodName = foodNameEditText.getText().toString();
         String foodCaloriesStr = foodCaloriesEditText.getText().toString();
 
-        if (!foodName.isEmpty() && !foodCaloriesStr.isEmpty()) {
+        if (validateInput(foodName, foodCaloriesStr)) {
             int foodCalories = Integer.parseInt(foodCaloriesStr);
 
             // Insert the food entry into the database
@@ -60,5 +60,10 @@ public class AddEntryActivity extends AppCompatActivity {
         }
     }
 
-
+    private boolean validateInput(String... inputs) {
+        for (String input : inputs) {
+            if (input == null || input.isEmpty()) return false;
+        }
+        return true;
+    }
 }

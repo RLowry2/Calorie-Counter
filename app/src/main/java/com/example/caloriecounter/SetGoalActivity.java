@@ -17,39 +17,84 @@ public class SetGoalActivity extends AppCompatActivity {
     private EditText goalEditText;
     private Button saveButton;
     private String selectedDate;
+    private FoodDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_goal);
 
+        initializeUI();
+        loadExistingGoal();
+        setupSaveButtonListener();
+    }
+
+    /**
+     * Initializes the UI components and retrieves the selected date.
+     */
+    private void initializeUI() {
+        goalEditText = findViewById(R.id.goalEditText);
+        saveButton = findViewById(R.id.saveButton);
+        dbHelper = new FoodDatabaseHelper(this);
+
         // Get date from intent, or default to today
         selectedDate = getIntent().getStringExtra("selectedDate");
         if (selectedDate == null) {
-            selectedDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+            selectedDate = getCurrentDate();
         }
+    }
 
-        goalEditText = findViewById(R.id.goalEditText);
-        saveButton = findViewById(R.id.saveButton);
+    /**
+     * Retrieves the current date in "yyyy-MM-dd" format.
+     */
+    private String getCurrentDate() {
+        return new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+    }
 
-        // Load the goal for the selected date from the database
-        FoodDatabaseHelper dbHelper = new FoodDatabaseHelper(this);
+    /**
+     * Loads the existing goal for the selected date into the EditText field.
+     */
+    private void loadExistingGoal() {
         int currentGoal = dbHelper.getGoalForDate(selectedDate);
         if (currentGoal > 0) {
             goalEditText.setText(String.valueOf(currentGoal));
         }
+    }
 
-        saveButton.setOnClickListener(v -> {
-            String goalText = goalEditText.getText().toString();
-            if (!TextUtils.isEmpty(goalText)) {
-                int goal = Integer.parseInt(goalText);
-                dbHelper.setGoalForDate(selectedDate, goal);
-                Toast.makeText(this, "Goal for " + selectedDate + " set to " + goal + " calories.", Toast.LENGTH_SHORT).show();
-                setResult(RESULT_OK);
-                finish();
-            } else {
-                Toast.makeText(this, "Please enter a valid goal.", Toast.LENGTH_SHORT).show();
-            }
-        });
+    /**
+     * Sets up the Save button's click listener.
+     */
+    private void setupSaveButtonListener() {
+        saveButton.setOnClickListener(v -> saveGoal());
+    }
+
+    /**
+     * Handles saving the new goal to the database.
+     */
+    private void saveGoal() {
+        String goalText = goalEditText.getText().toString();
+        if (isValidInput(goalText)) {
+            int goal = Integer.parseInt(goalText);
+            dbHelper.setGoalForDate(selectedDate, goal);
+            showToast("Goal for " + selectedDate + " set to " + goal + " calories.");
+            setResult(RESULT_OK);
+            finish();
+        } else {
+            showToast("Please enter a valid goal.");
+        }
+    }
+
+    /**
+     * Validates the input for the goal field.
+     */
+    private boolean isValidInput(String input) {
+        return !TextUtils.isEmpty(input) && TextUtils.isDigitsOnly(input);
+    }
+
+    /**
+     * Displays a toast message.
+     */
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

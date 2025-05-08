@@ -70,36 +70,41 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
                 .setCancelable(false)
                 .setPositiveButton("Submit", null) // Overriding below
                 .setNegativeButton("Cancel", (d, which) -> d.dismiss())
-                .setNeutralButton("Delete", (d, which) -> {
-                    if (deleteListener != null) {
-                        deleteListener.onDelete(food, position);
-                    }
-                })
+                .setNeutralButton("Delete", (d, which) -> handleDelete(food, position))
                 .create();
 
         dialog.setOnShowListener(d -> {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                String newName = editName.getText().toString().trim();
-                String newCaloriesStr = editCalories.getText().toString().trim();
-
-                if (newName.isEmpty() || newCaloriesStr.isEmpty()) {
-                    Toast.makeText(view.getContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                try {
-                    int newCalories = Integer.parseInt(newCaloriesStr);
-                    food.setName(newName);
-                    food.setCalories(newCalories);
-                    notifyItemChanged(position);
-                    dialog.dismiss();
-                } catch (NumberFormatException e) {
-                    Toast.makeText(view.getContext(), "Calories must be a number", Toast.LENGTH_SHORT).show();
-                }
-            });
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v ->
+                    handlePositiveButtonClick(dialog, food, position, editName, editCalories));
         });
 
         dialog.show();
+    }
+
+    private void handlePositiveButtonClick(AlertDialog dialog, FoodEntry food, int position, EditText editName, EditText editCalories) {
+        String newName = editName.getText().toString().trim();
+        String newCaloriesStr = editCalories.getText().toString().trim();
+
+        if (newName.isEmpty() || newCaloriesStr.isEmpty()) {
+            Toast.makeText(dialog.getContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            int newCalories = Integer.parseInt(newCaloriesStr);
+            food.setName(newName);
+            food.setCalories(newCalories);
+            notifyItemChanged(position);
+            dialog.dismiss();
+        } catch (NumberFormatException e) {
+            Toast.makeText(dialog.getContext(), "Calories must be a number", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void handleDelete(FoodEntry food, int position) {
+        if (deleteListener != null) {
+            deleteListener.onDelete(food, position);
+        }
     }
 
     public void removeItem(int position) {

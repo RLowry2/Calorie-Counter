@@ -59,18 +59,20 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
                 "SELECT * FROM " + TBL + " WHERE " + COL_DATE + " = ? AND " + COL_NAME + " IS NOT NULL",
                 new String[]{ date }
         );
-        if (c.moveToFirst()) {
-            do {
-                out.add(new FoodEntry(
-                        c.getInt(c.getColumnIndexOrThrow(COL_ID)),
-                        c.getString(c.getColumnIndexOrThrow(COL_NAME)),
-                        c.getInt(c.getColumnIndexOrThrow(COL_CAL)),
-                        c.getString(c.getColumnIndexOrThrow(COL_DATE))
-                ));
-            } while (c.moveToNext());
+        while (c.moveToNext()) {
+            out.add(mapCursorToFoodEntry(c));
         }
         c.close();
         return out;
+    }
+
+    private FoodEntry mapCursorToFoodEntry(Cursor c) {
+        return new FoodEntry(
+                c.getInt(c.getColumnIndexOrThrow(COL_ID)),
+                c.getString(c.getColumnIndexOrThrow(COL_NAME)),
+                c.getInt(c.getColumnIndexOrThrow(COL_CAL)),
+                c.getString(c.getColumnIndexOrThrow(COL_DATE))
+        );
     }
 
     public void deleteFood(int id) {

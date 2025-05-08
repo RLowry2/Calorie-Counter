@@ -103,18 +103,22 @@ public class MainActivity extends AppCompatActivity {
         int total = 0;
         for (FoodEntry e : foodList) total += e.getCalories();
 
-        TextView totalTxt = findViewById(R.id.totalCaloriesText);
-        totalTxt.setText("Total Calories: " + total);
-
         int goal = db.getGoalForDate(today);
+        TextView totalTxt = findViewById(R.id.totalCaloriesText);
+        totalTxt.setText("Total Calories: " + total + "/" + goal);
+
         if (goal > 0) {
             double pct = (double) total / goal;
-            if (pct > 1)        totalTxt.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            else if (pct >= .7) totalTxt.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
-            else                totalTxt.setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
+            totalTxt.setTextColor(getColorForPercentage(pct));
         }
 
         adapter.notifyDataSetChanged();
+    }
+
+    private int getColorForPercentage(double percentage) {
+        if (percentage > 1) return getResources().getColor(android.R.color.holo_red_dark);
+        if (percentage >= .7) return getResources().getColor(android.R.color.holo_green_dark);
+        return getResources().getColor(android.R.color.holo_orange_dark);
     }
 
     private void promptSetGoal() {
