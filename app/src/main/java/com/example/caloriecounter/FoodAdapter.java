@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,9 +46,6 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
             showEditDialog(view, food, position);
             return true;
         });
-
-        // Hide delete button from earlier implementation
-        holder.deleteButton.setVisibility(View.GONE);
     }
 
     @Override
@@ -124,13 +120,11 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
 
     public class FoodViewHolder extends RecyclerView.ViewHolder {
         TextView nameView, calorieView;
-        ImageButton deleteButton;
 
         public FoodViewHolder(@NonNull View itemView) {
             super(itemView);
             nameView = itemView.findViewById(R.id.textName);
             calorieView = itemView.findViewById(R.id.textCalories);
-            deleteButton = itemView.findViewById(R.id.buttonDelete);
         }
     }
 

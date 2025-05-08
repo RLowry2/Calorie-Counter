@@ -6,17 +6,18 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <!-- Food Name Input -->
     <EditText
         android:id="@+id/editFoodName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Food Name" />
 
+    <!-- Food Calories Input -->
     <EditText
         android:id="@+id/editFoodCalories"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Calories"
         android:inputType="number" />
-
 </LinearLayout>

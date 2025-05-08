@@ -3,6 +3,7 @@ package com.example.caloriecounter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.CalendarView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -52,6 +53,10 @@ public class CalendarActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
+
+        // Hide the status bar
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         calendarView      = findViewById(R.id.calendarView);
         totalCaloriesText = findViewById(R.id.totalCaloriesText);

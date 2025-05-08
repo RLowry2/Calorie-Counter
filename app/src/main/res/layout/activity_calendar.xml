@@ -11,6 +11,19 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Calendar Title -->
+        <TextView
+            android:id="@+id/calendarTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Calendar"
+            style="@style/TextAppearance.AppTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:gravity="center" />
+
+
         <!-- Android Native CalendarView at the top -->
         <CalendarView
             android:id="@+id/calendarView"
@@ -25,8 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Total Calories: 0"
-            android:textSize="18sp"
-            android:textColor="#000000"
+            style="@style/TextAppearance.CalorieCounter.Title"
             android:gravity="center"
             android:layout_marginBottom="8dp" />
 
@@ -36,9 +48,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Goal: 0"
-            android:textSize="18sp"
+            style="@style/TextAppearance.CalorieCounter.Subtitle"
             android:layout_marginTop="10dp"
-            android:layout_gravity="center_horizontal"/>
+            android:layout_gravity="center_horizontal" />
 
         <!-- RecyclerView for Food Entries -->
         <androidx.recyclerview.widget.RecyclerView
