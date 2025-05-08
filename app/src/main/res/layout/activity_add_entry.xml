@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     tools:context=".AddEntryActivity">
 
     <!-- Food Name EditText -->
@@ -12,10 +13,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Food Name"
+        android:backgroundTint="#FF9800"
+        android:textColor="#000000"
+        android:textColorHint="#757575"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="350dp"
         android:padding="16dp" />
 
     <!-- Food Calories EditText -->
@@ -24,6 +28,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Calories"
+        android:backgroundTint="#FF9800"
+        android:textColor="#000000"
+        android:textColorHint="#757575"
         android:inputType="number"
         app:layout_constraintTop_toBottomOf="@+id/foodNameEditText"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,6 +44,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Save"
+        android:backgroundTint="#4CAF50"
+        android:textColor="#FFFFFF"
         app:layout_constraintTop_toBottomOf="@+id/foodCaloriesEditText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

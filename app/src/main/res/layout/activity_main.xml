@@ -18,6 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:paddingTop="20dp"
+        android:contentDescription="App Title: Calorie Counter"
         android:gravity="center"/>
 
     <!-- Today's Date -->
@@ -31,6 +32,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appTitle"
+        android:contentDescription="Today's Date"
         android:gravity="center"/>
 
     <!-- Total Calories for the Date -->
@@ -44,6 +46,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/todaysDate"
+        android:contentDescription="Total Calories for the Date"
         android:gravity="center"
         android:layout_marginTop="8dp"/>
 
@@ -56,7 +59,8 @@
         app:layout_constraintTop_toBottomOf="@+id/totalCaloriesText"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="List of food entries" />
 
     <!-- Floating Action Button (FAB) for the menu -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
