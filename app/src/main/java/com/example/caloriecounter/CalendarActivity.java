@@ -82,6 +82,7 @@ public class CalendarActivity extends AppCompatActivity {
         // Date change listener:
         calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
             selectedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth);
+            propagateGoalIfNeeded(selectedDate); // Propagate goal if selected date is in the future
             updateUIForSelectedDate(selectedDate);
         });
 
@@ -117,6 +118,7 @@ public class CalendarActivity extends AppCompatActivity {
 
     private void updateUIForSelectedDate(String date) {
         FoodDatabaseHelper db = new FoodDatabaseHelper(this);
+
         foodList.clear();
         foodList.addAll(db.getFoodEntriesForDate(date));
 
@@ -139,5 +141,15 @@ public class CalendarActivity extends AppCompatActivity {
         if (percentage > 1) return getResources().getColor(android.R.color.holo_red_dark);
         if (percentage >= .7) return getResources().getColor(android.R.color.holo_green_dark);
         return getResources().getColor(android.R.color.holo_orange_dark);
+    }
+
+    private void propagateGoalIfNeeded(String selectedDate) {
+        FoodDatabaseHelper db = new FoodDatabaseHelper(this);
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+        // Only propagate if the selected date is in the future
+        if (selectedDate.compareTo(today) > 0) {
+            db.propagateGoalToFutureDate(today, selectedDate);
+        }
     }
 }

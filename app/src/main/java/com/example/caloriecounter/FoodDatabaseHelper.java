@@ -19,7 +19,6 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
     private static final String COL_NAME = "name";
     private static final String COL_CAL = "calories";
     private static final String COL_DATE = "date";
-    private static final String COL_GOAL = "goal";
 
     // Table for daily goals
     private static final String GOALS_TBL = "daily_goals";
@@ -35,27 +34,26 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
                 + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COL_NAME + " TEXT,"
                 + COL_CAL + " INTEGER,"
-                + COL_DATE + " TEXT,"
-                + COL_GOAL + " INTEGER DEFAULT 0"
+                + COL_DATE + " TEXT"
                 + ")");
 
         // Create table for daily goals
-        db.execSQL("CREATE TABLE " + GOALS_TBL + " (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "date TEXT UNIQUE NOT NULL, " +
-                "goal INTEGER NOT NULL)");
+        db.execSQL("CREATE TABLE " + GOALS_TBL + " ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "date TEXT UNIQUE NOT NULL, "
+                + "goal INTEGER NOT NULL)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldV, int newV) {
         if (oldV < 2) {
-            db.execSQL("ALTER TABLE " + TBL + " ADD COLUMN " + COL_GOAL + " INTEGER DEFAULT 0");
+            db.execSQL("ALTER TABLE " + TBL + " ADD COLUMN goal INTEGER DEFAULT 0");
         }
         if (oldV < 3) {
-            db.execSQL("CREATE TABLE IF NOT EXISTS " + GOALS_TBL + " (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "date TEXT UNIQUE NOT NULL, " +
-                    "goal INTEGER NOT NULL)");
+            db.execSQL("CREATE TABLE IF NOT EXISTS " + GOALS_TBL + " ("
+                    + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + "date TEXT UNIQUE NOT NULL, "
+                    + "goal INTEGER NOT NULL)");
         }
     }
 
@@ -82,6 +80,7 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
             out.add(mapCursorToFoodEntry(c));
         }
         c.close();
+        db.close();
         return out;
     }
 
@@ -103,16 +102,16 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Insert or update goal for a specific date
-    public void insertOrUpdateGoal(String date, int goal) {
-        SQLiteDatabase db = getWritableDatabase();
+    public void setGoalForDate(String date, int goal) {
+        SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("date", date);
         values.put("goal", goal);
 
-        // Check if a goal already exists for the date
+        // Attempt to update an existing goal
         int updated = db.update(GOALS_TBL, values, "date = ?", new String[]{date});
         if (updated == 0) {
-            // Insert a new goal if none exists
+            // Insert a new goal if update fails
+            values.put("date", date);
             db.insert(GOALS_TBL, null, values);
         }
         db.close();
@@ -135,26 +134,11 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
         return goal;
     }
 
-    // Set goal for a specific date (alternative to insertOrUpdateGoal)
-    public void setGoalForDate(String date, int goal) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("goal", goal);
-
-        // Attempt to update an existing goal
-        int updated = db.update(GOALS_TBL, values, "date = ?", new String[]{date});
-        if (updated == 0) {
-            // Insert a new goal if update fails
-            values.put("date", date);
-            db.insert(GOALS_TBL, null, values);
+    // Propagate the current goal to a future date if no goal exists for that date
+    public void propagateGoalToFutureDate(String currentDate, String futureDate) {
+        int currentGoal = getGoalForDate(currentDate);
+        if (currentGoal > 0 && getGoalForDate(futureDate) == 0) {
+            setGoalForDate(futureDate, currentGoal);
         }
-        db.close();
-    }
-
-    // Delete goal for a specific date (optional utility method)
-    public void deleteGoalForDate(String date) {
-        SQLiteDatabase db = getWritableDatabase();
-        db.delete(GOALS_TBL, "date = ?", new String[]{ date });
-        db.close();
     }
 }

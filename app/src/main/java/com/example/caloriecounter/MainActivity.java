@@ -49,6 +49,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+    // Launcher for SetGoalActivity:
+    private final ActivityResultLauncher<Intent> setGoalLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    loadFoods(); // Refresh the UI when the goal is updated
+                }
+            });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,13 +111,20 @@ public class MainActivity extends AppCompatActivity {
     private void loadFoods() {
         FoodDatabaseHelper db = new FoodDatabaseHelper(this);
         String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        String selectedDate = today; // Assuming today is the default
+
+        // Propagate today's goal to the selected date if it's in the future
+        if (selectedDate.compareTo(today) > 0) {
+            db.propagateGoalToFutureDate(today, selectedDate);
+        }
+
         foodList.clear();
-        foodList.addAll(db.getFoodEntriesForDate(today));
+        foodList.addAll(db.getFoodEntriesForDate(selectedDate));
 
         int total = 0;
         for (FoodEntry e : foodList) total += e.getCalories();
 
-        int goal = db.getGoalForDate(today);
+        int goal = db.getGoalForDate(selectedDate);
         TextView totalTxt = findViewById(R.id.totalCaloriesText);
         totalTxt.setText("Total Calories: " + total + "/" + goal);
 
@@ -134,7 +149,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Log the intent data for debugging
         Log.d("MainActivity", "Launching SetGoalActivity with date: " + today);
-        startActivity(intent);
+
+        // Launch the activity using the ActivityResultLauncher
+        setGoalLauncher.launch(intent);
     }
 
     private void onDeleteButtonClicked(FoodEntry entry, int pos) {

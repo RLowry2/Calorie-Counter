@@ -69,7 +69,17 @@ public class SetGoalActivity extends AppCompatActivity {
             goalEditText.setText(String.valueOf(currentGoal));
         } else {
             Log.d("SetGoalActivity", "No goal found for date: " + selectedDate);
-            goalEditText.setText(""); // Clear the field if no goal exists
+
+            // Automatically propagate today's goal to this future date
+            String today = getCurrentDate();
+            int todayGoal = dbHelper.getGoalForDate(today);
+            if (todayGoal > 0) {
+                dbHelper.propagateGoalToFutureDate(today, selectedDate);
+                goalEditText.setText(String.valueOf(todayGoal));
+                Log.d("SetGoalActivity", "Propagated today's goal (" + todayGoal + ") to " + selectedDate);
+            } else {
+                goalEditText.setText(""); // Clear the field if no goal exists
+            }
         }
     }
 
