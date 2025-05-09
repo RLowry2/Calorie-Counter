@@ -3,10 +3,9 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="white">#FFFFFF</color>
-    <color name="red">#FF0000</color>
+    <color name="grey">#D3D3D3</color>
     <color name="green">#00FF00</color>
     <color name="black">#000000</color>
-    <color name="beige">#FFF7F3</color>
-    <color name="background">#F8F3D9</color>
-    <color name="appTitleBackground">#FFCC00</color>
+    <color name="background">#FFF7F3</color>
+    <color name="appTitleBackground">#F2E2B1</color>
 </resources>

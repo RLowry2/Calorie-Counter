@@ -11,8 +11,9 @@ import java.util.List;
 
 public class FoodDatabaseHelper extends SQLiteOpenHelper {
     private static final String NAME = "calorieCounter.db";
-    private static final int VERSION = 2;
+    private static final int VERSION = 3; // Incremented version to include the daily_goals table
 
+    // Table for food entries
     private static final String TBL = "food_entries";
     private static final String COL_ID = "id";
     private static final String COL_NAME = "name";
@@ -20,12 +21,16 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
     private static final String COL_DATE = "date";
     private static final String COL_GOAL = "goal";
 
+    // Table for daily goals
+    private static final String GOALS_TBL = "daily_goals";
+
     public FoodDatabaseHelper(Context ctx) {
         super(ctx, NAME, null, VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // Create table for food entries
         db.execSQL("CREATE TABLE " + TBL + "("
                 + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COL_NAME + " TEXT,"
@@ -33,6 +38,12 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
                 + COL_DATE + " TEXT,"
                 + COL_GOAL + " INTEGER DEFAULT 0"
                 + ")");
+
+        // Create table for daily goals
+        db.execSQL("CREATE TABLE " + GOALS_TBL + " (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "date TEXT UNIQUE NOT NULL, " +
+                "goal INTEGER NOT NULL)");
     }
 
     @Override
@@ -40,8 +51,15 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
         if (oldV < 2) {
             db.execSQL("ALTER TABLE " + TBL + " ADD COLUMN " + COL_GOAL + " INTEGER DEFAULT 0");
         }
+        if (oldV < 3) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS " + GOALS_TBL + " (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "date TEXT UNIQUE NOT NULL, " +
+                    "goal INTEGER NOT NULL)");
+        }
     }
 
+    // Insert a new food entry
     public void insertFood(String name, int cal, String date) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues v = new ContentValues();
@@ -52,6 +70,7 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    // Retrieve food entries for a specific date
     public List<FoodEntry> getFoodEntriesForDate(String date) {
         List<FoodEntry> out = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
@@ -66,6 +85,7 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
         return out;
     }
 
+    // Map cursor to FoodEntry object
     private FoodEntry mapCursorToFoodEntry(Cursor c) {
         return new FoodEntry(
                 c.getInt(c.getColumnIndexOrThrow(COL_ID)),
@@ -75,63 +95,66 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
         );
     }
 
+    // Delete a food entry
     public void deleteFood(int id) {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TBL, COL_ID + "=?", new String[]{ String.valueOf(id) });
         db.close();
     }
 
-    /** Insert or update **only today’s** goal */
+    // Insert or update goal for a specific date
     public void insertOrUpdateGoal(String date, int goal) {
         SQLiteDatabase db = getWritableDatabase();
-        ContentValues v = new ContentValues();
-        v.put(COL_GOAL, goal);
+        ContentValues values = new ContentValues();
+        values.put("date", date);
+        values.put("goal", goal);
 
-        Cursor c = db.rawQuery(
-                "SELECT " + COL_ID + " FROM " + TBL +
-                        " WHERE " + COL_DATE + " = ? AND " + COL_NAME + " IS NULL",
-                new String[]{ date }
-        );
-        if (c.moveToFirst()) {
-            // update existing row
-            db.update(TBL, v,
-                    COL_DATE + "=? AND " + COL_NAME + " IS NULL",
-                    new String[]{ date });
-        } else {
-            // insert new “goal only” row
-            v.put(COL_DATE, date);
-            v.putNull(COL_NAME);
-            db.insert(TBL, null, v);
+        // Check if a goal already exists for the date
+        int updated = db.update(GOALS_TBL, values, "date = ?", new String[]{date});
+        if (updated == 0) {
+            // Insert a new goal if none exists
+            db.insert(GOALS_TBL, null, values);
         }
-        c.close();
         db.close();
     }
 
+    // Retrieve goal for a specific date
     public int getGoalForDate(String date) {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery(
-                "SELECT " + COL_GOAL +
-                        " FROM " + TBL +
-                        " WHERE " + COL_DATE + " = ? AND " + COL_NAME + " IS NULL",
+        Cursor cursor = db.rawQuery(
+                "SELECT goal FROM " + GOALS_TBL + " WHERE date = ?",
                 new String[]{ date }
         );
-        int g = 0;
-        if (c.moveToFirst()) g = c.getInt(0);
-        c.close();
-        return g;
+
+        int goal = 0; // Default value
+        if (cursor.moveToFirst()) {
+            goal = cursor.getInt(0);
+        }
+        cursor.close();
+        db.close();
+        return goal;
     }
 
+    // Set goal for a specific date (alternative to insertOrUpdateGoal)
     public void setGoalForDate(String date, int goal) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("goal", goal);
 
-        int updated = db.update("daily_goals", values, "date = ?", new String[]{date});
+        // Attempt to update an existing goal
+        int updated = db.update(GOALS_TBL, values, "date = ?", new String[]{date});
         if (updated == 0) {
-            // Insert if not exists
+            // Insert a new goal if update fails
             values.put("date", date);
-            db.insert("daily_goals", null, values);
+            db.insert(GOALS_TBL, null, values);
         }
+        db.close();
     }
 
+    // Delete goal for a specific date (optional utility method)
+    public void deleteGoalForDate(String date) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(GOALS_TBL, "date = ?", new String[]{ date });
+        db.close();
+    }
 }

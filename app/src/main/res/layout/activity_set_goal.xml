@@ -1,33 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".SetGoalActivity">
+    android:layout_height="match_parent">
 
-    <!-- Goal Input -->
-    <EditText
-        android:id="@+id/goalEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Enter Calorie Goal"
-        android:inputType="number"
-        style="@style/EditTextStyle.CalorieCounter"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="100dp" />
+    <!-- Main Content in a LinearLayout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <!-- Save Button -->
-    <Button
-        android:id="@+id/saveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save Goal"
-        style="@style/ButtonStyle.CalorieCounter"
-        app:layout_constraintTop_toBottomOf="@id/goalEditText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Page Title -->
+        <TextView
+            android:id="@+id/pageTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Set Goal"
+            style="@style/TextAppearance.AppTitle"
+            android:gravity="center"
+            android:background="@color/appTitleBackground"
+            android:padding="16dp" />
+
+        <!-- Goal Input -->
+        <EditText
+            android:id="@+id/goalEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter Calorie Goal"
+            android:inputType="number"
+            style="@style/EditTextStyle.CalorieCounter"
+            android:layout_marginTop="24dp" />
+
+        <!-- Save Button -->
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save Goal"
+            style="@style/ButtonStyle.CalorieCounter"
+            android:layout_marginTop="24dp"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+</FrameLayout>

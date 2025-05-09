@@ -2,6 +2,7 @@ package com.example.caloriecounter;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -47,6 +48,9 @@ public class SetGoalActivity extends AppCompatActivity {
         if (selectedDate == null) {
             selectedDate = getCurrentDate();
         }
+
+        // Log the selectedDate for debugging
+        Log.d("SetGoalActivity", "Selected date: " + selectedDate);
     }
 
     /**
@@ -63,6 +67,9 @@ public class SetGoalActivity extends AppCompatActivity {
         int currentGoal = dbHelper.getGoalForDate(selectedDate);
         if (currentGoal > 0) {
             goalEditText.setText(String.valueOf(currentGoal));
+        } else {
+            Log.d("SetGoalActivity", "No goal found for date: " + selectedDate);
+            goalEditText.setText(""); // Clear the field if no goal exists
         }
     }
 

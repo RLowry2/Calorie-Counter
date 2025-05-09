@@ -2,6 +2,7 @@ package com.example.caloriecounter;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.CalendarView;
@@ -103,6 +104,9 @@ public class CalendarActivity extends AppCompatActivity {
             } else if (item.getItemId() == 2) {
                 Intent i2 = new Intent(this, SetGoalActivity.class);
                 i2.putExtra("selectedDate", selectedDate);
+
+                // Log the intent data for debugging
+                Log.d("CalendarActivity", "Launching SetGoalActivity with date: " + selectedDate);
                 setGoalLauncher.launch(i2);
                 return true;
             }

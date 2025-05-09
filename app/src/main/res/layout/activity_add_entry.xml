@@ -1,46 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".AddEntryActivity">
+    android:layout_height="match_parent">
 
-    <!-- Food Name EditText -->
-    <EditText
-        android:id="@+id/foodNameEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Food Name"
-        style="@style/EditTextStyle.CalorieCounter"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="350dp" />
+    <!-- Main Content in a LinearLayout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <!-- Food Calories EditText -->
-    <EditText
-        android:id="@+id/foodCaloriesEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Calories"
-        android:inputType="number"
-        style="@style/EditTextStyle.CalorieCounter"
-        app:layout_constraintTop_toBottomOf="@+id/foodNameEditText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp" />
+        <!-- Page Title -->
+        <TextView
+            android:id="@+id/pageTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Entry"
+            style="@style/TextAppearance.AppTitle"
+            android:gravity="center"
+            android:background="@color/appTitleBackground"
+            android:padding="16dp" />
 
-    <!-- Save Button -->
-    <Button
-        android:id="@+id/saveButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Save"
-        style="@style/ButtonStyle.CalorieCounter"
-        app:layout_constraintTop_toBottomOf="@+id/foodCaloriesEditText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp" />
+        <!-- Food Name EditText -->
+        <EditText
+            android:id="@+id/foodNameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Food Name"
+            style="@style/EditTextStyle.CalorieCounter"
+            android:layout_marginTop="24dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Food Calories EditText -->
+        <EditText
+            android:id="@+id/foodCaloriesEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Calories"
+            android:inputType="number"
+            style="@style/EditTextStyle.CalorieCounter"
+            android:layout_marginTop="16dp" />
+
+        <!-- Save Button -->
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            style="@style/ButtonStyle.CalorieCounter"
+            android:layout_marginTop="24dp"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+</FrameLayout>

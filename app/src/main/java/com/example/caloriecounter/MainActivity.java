@@ -3,6 +3,7 @@ package com.example.caloriecounter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                     calendarLauncher.launch(new Intent(this, CalendarActivity.class));
                     return true;
                 case 3:
-                    promptSetGoal();
+                    openSetGoalActivity();
                     return true;
                 default:
                     return false;
@@ -126,27 +127,14 @@ public class MainActivity extends AppCompatActivity {
         return getResources().getColor(android.R.color.holo_orange_dark);
     }
 
-    private void promptSetGoal() {
-        final String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-        AlertDialog.Builder b = new AlertDialog.Builder(this)
-                .setTitle("Set daily calorie goal");
-        EditText in = new EditText(this);
-        in.setInputType(InputType.TYPE_CLASS_NUMBER);
-        int existing = new FoodDatabaseHelper(this).getGoalForDate(today);
-        if (existing > 0) in.setText(String.valueOf(existing));
-        b.setView(in)
-                .setPositiveButton("Save", (d, w) -> {
-                    String s = in.getText().toString().trim();
-                    if (s.isEmpty()) {
-                        Toast.makeText(this, "Enter a number", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    int goal = Integer.parseInt(s);
-                    new FoodDatabaseHelper(this).insertOrUpdateGoal(today, goal);
-                    loadFoods();
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+    private void openSetGoalActivity() {
+        Intent intent = new Intent(this, SetGoalActivity.class);
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        intent.putExtra("selectedDate", today); // Pass today's date to the activity
+
+        // Log the intent data for debugging
+        Log.d("MainActivity", "Launching SetGoalActivity with date: " + today);
+        startActivity(intent);
     }
 
     private void onDeleteButtonClicked(FoodEntry entry, int pos) {
