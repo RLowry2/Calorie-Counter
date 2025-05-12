@@ -1,16 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
     android:padding="16dp">
 
-    <!-- Placeholder Text -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Exercise Tracking Coming Soon!"
-        android:textSize="18sp"
-        android:gravity="center" />
-</LinearLayout>
+    <!-- Main Content in a LinearLayout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/pageTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Exercises"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Current Date -->
+        <TextView
+            android:id="@+id/currentDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="May 12, 2025"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Button to Create a Routine -->
+        <Button
+            android:id="@+id/createRoutineButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Routine"
+            android:layout_marginBottom="16dp" />
+
+        <!-- RecyclerView to Display Exercises -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/exerciseRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:contentDescription="List of exercises" />
+    </LinearLayout>
+</FrameLayout>

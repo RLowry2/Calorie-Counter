@@ -1,35 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
     android:padding="16dp">
 
-    <!-- Title -->
-    <TextView
-        android:id="@+id/appTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Calorie Counter"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="32dp" />
-
-    <!-- Button to navigate to CaloriesActivity -->
-    <Button
-        android:id="@+id/caloriesButton"
+    <!-- Main Content in a LinearLayout -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Calories"
-        android:layout_marginBottom="16dp" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
 
-    <!-- Button to navigate to ExercisesActivity -->
-    <Button
-        android:id="@+id/exercisesButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Exercises" />
+        <!-- Title -->
+        <TextView
+            android:id="@+id/appTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Calorie Counter"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="32dp" />
 
-</LinearLayout>
+        <!-- Button to navigate to CaloriesActivity -->
+        <Button
+            android:id="@+id/caloriesButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Calories"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Button to navigate to ExercisesActivity -->
+        <Button
+            android:id="@+id/exercisesButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Exercises" />
+
+    </LinearLayout>
+</FrameLayout>
