@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -152,7 +153,7 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Insert or update a routine
-    public void insertOrUpdateRoutine(String day, String exerciseName, int sets, int reps) {
+    public boolean insertOrUpdateRoutine(String day, String exerciseName, int sets, int reps) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COL_DAY, day);
@@ -160,17 +161,29 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
         values.put(COL_SETS, sets);
         values.put(COL_REPS, reps);
 
-        // Attempt to update an existing routine
-        int updated = db.update(ROUTINES_TBL, values, COL_DAY + " = ? AND " + COL_EXERCISE_NAME + " = ?", new String[]{day, exerciseName});
-        if (updated == 0) {
-            // Insert a new routine if no existing entry was updated
-            db.insert(ROUTINES_TBL, null, values);
+        boolean success;
+
+        try {
+            // Attempt to update an existing routine
+            int updated = db.update(ROUTINES_TBL, values, COL_DAY + " = ? AND " + COL_EXERCISE_NAME + " = ?", new String[]{day, exerciseName});
+
+            if (updated == 0) {
+                // Insert a new routine if no existing entry was updated
+                long insertedId = db.insert(ROUTINES_TBL, null, values);
+                success = insertedId != -1; // Check if the insert was successful
+            } else {
+                success = true; // Update was successful
+            }
+        } catch (Exception e) {
+            Log.e("DatabaseError", "Error inserting or updating routine", e);
+            success = false; // Something went wrong
+        } finally {
+            db.close(); // Ensure the database is closed
         }
 
-        db.close();
+        return success;
     }
 
-    // Retrieve routines for a specific day
     public List<ExerciseEntry> getRoutinesForDay(String day) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + ROUTINES_TBL + " WHERE " + COL_DAY + " = ?", new String[]{day});
@@ -180,7 +193,12 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
             String exerciseName = cursor.getString(cursor.getColumnIndexOrThrow(COL_EXERCISE_NAME));
             int sets = cursor.getInt(cursor.getColumnIndexOrThrow(COL_SETS));
             int reps = cursor.getInt(cursor.getColumnIndexOrThrow(COL_REPS));
-            routines.add(new ExerciseEntry(exerciseName, sets, reps)); // Matches the three-argument constructor
+            routines.add(new ExerciseEntry(exerciseName, sets, reps));
+        }
+
+        Log.d("DatabaseDebug", "Query for day: " + day + ", Results: " + routines.size());
+        for (ExerciseEntry entry : routines) {
+            Log.d("DatabaseDebug", "Exercise: " + entry.getName() + ", Sets: " + entry.getSets() + ", Reps: " + entry.getReps());
         }
 
         cursor.close();
@@ -204,5 +222,12 @@ public class FoodDatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return routines;
+    }
+
+    public int clearRoutinesForDay(String day) {
+        SQLiteDatabase db = getWritableDatabase();
+        int rowsDeleted = db.delete(ROUTINES_TBL, COL_DAY + " = ?", new String[]{day});
+        db.close();
+        return rowsDeleted;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.caloriecounter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
     @Override
     public void onBindViewHolder(@NonNull ExerciseViewHolder holder, int position) {
         ExerciseEntry exercise = exercises.get(position);
+        Log.d("AdapterDebug", "Binding exercise: " + exercise.getName());
         holder.exerciseTitle.setText(exercise.getName());
         holder.setsAndReps.setText(exercise.getSets() + " sets of " + exercise.getReps() + " reps");
 
