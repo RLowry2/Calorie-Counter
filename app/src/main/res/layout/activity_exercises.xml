@@ -18,6 +18,13 @@
         android:text="Clear Exercises"
         android:layout_marginTop="8dp" />
 
+    <Button
+        android:id="@+id/databaseButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Database"
+        android:layout_marginTop="16dp" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/exerciseRecyclerView"
         android:layout_width="match_parent"

@@ -69,7 +69,7 @@ public class CalendarActivity extends AppCompatActivity {
         foodList = new ArrayList<>();
         adapter = new FoodAdapter(foodList, (foodEntry, position) -> {
             // Delete from DB + refresh UI + bubble result
-            new FoodDatabaseHelper(this).deleteFood(foodEntry.getId());
+            new DatabaseHelper(this).deleteFood(foodEntry.getId());
             updateUIForSelectedDate(selectedDate);
             setResult(RESULT_OK);
         });
@@ -117,7 +117,7 @@ public class CalendarActivity extends AppCompatActivity {
     }
 
     private void updateUIForSelectedDate(String date) {
-        FoodDatabaseHelper db = new FoodDatabaseHelper(this);
+        DatabaseHelper db = new DatabaseHelper(this);
 
         foodList.clear();
         foodList.addAll(db.getFoodEntriesForDate(date));
@@ -144,7 +144,7 @@ public class CalendarActivity extends AppCompatActivity {
     }
 
     private void propagateGoalIfNeeded(String selectedDate) {
-        FoodDatabaseHelper db = new FoodDatabaseHelper(this);
+        DatabaseHelper db = new DatabaseHelper(this);
         String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
         // Only propagate if the selected date is in the future

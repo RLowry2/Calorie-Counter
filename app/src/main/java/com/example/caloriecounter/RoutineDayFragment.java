@@ -50,9 +50,9 @@ public class RoutineDayFragment extends Fragment {
         List<ExerciseEntry> exercises = new ArrayList<>();
         for (int i = 0; i < exerciseContainer.getChildCount(); i++) {
             View exerciseEntry = exerciseContainer.getChildAt(i);
-            EditText nameInput = exerciseEntry.findViewById(R.id.exerciseName);
-            EditText setsInput = exerciseEntry.findViewById(R.id.exerciseSets);
-            EditText repsInput = exerciseEntry.findViewById(R.id.exerciseReps);
+            EditText nameInput = exerciseEntry.findViewById(R.id.exerciseNameTextView);
+            EditText setsInput = exerciseEntry.findViewById(R.id.setsTextView);
+            EditText repsInput = exerciseEntry.findViewById(R.id.repsTextView);
 
             String name = nameInput.getText().toString().trim();
             String setsStr = setsInput.getText().toString().trim();

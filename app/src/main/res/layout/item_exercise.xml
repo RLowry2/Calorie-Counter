@@ -1,28 +1,31 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="8dp">
 
     <TextView
-        android:id="@+id/exerciseTitle"
-        android:layout_width="wrap_content"
+        android:id="@+id/exerciseNameTextView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Exercise Name"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:padding="4dp" />
 
     <TextView
-        android:id="@+id/setsAndReps"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="3 sets of 15 reps" />
-
-    <LinearLayout
-        android:id="@+id/setsContainer"
+        android:id="@+id/setsTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" />
+        android:text="Sets"
+        android:textSize="16sp"
+        android:padding="4dp" />
 
+    <TextView
+        android:id="@+id/repsTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Reps"
+        android:textSize="16sp"
+        android:padding="4dp" />
 </LinearLayout>

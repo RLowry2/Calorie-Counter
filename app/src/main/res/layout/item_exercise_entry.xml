@@ -7,7 +7,7 @@
 
     <!-- Exercise Name -->
     <EditText
-        android:id="@+id/exerciseName"
+        android:id="@+id/exerciseNameTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="2"
@@ -15,7 +15,7 @@
 
     <!-- Sets -->
     <EditText
-        android:id="@+id/exerciseSets"
+        android:id="@+id/setsTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -24,7 +24,7 @@
 
     <!-- Reps -->
     <EditText
-        android:id="@+id/exerciseReps"
+        android:id="@+id/repsTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"

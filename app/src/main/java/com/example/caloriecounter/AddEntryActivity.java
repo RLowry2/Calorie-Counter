@@ -17,7 +17,7 @@ public class AddEntryActivity extends AppCompatActivity {
 
     private EditText foodNameEditText, foodCaloriesEditText;
     private Button saveButton;
-    private FoodDatabaseHelper dbHelper;
+    private DatabaseHelper dbHelper;
     private String selectedDate;
 
     @Override
@@ -39,7 +39,7 @@ public class AddEntryActivity extends AppCompatActivity {
         foodCaloriesEditText = findViewById(R.id.foodCaloriesEditText);
         saveButton = findViewById(R.id.saveButton);
 
-        dbHelper = new FoodDatabaseHelper(this); // Initialize the database helper
+        dbHelper = new DatabaseHelper(this); // Initialize the database helper
 
         saveButton.setOnClickListener(v -> saveFoodEntry());
     }

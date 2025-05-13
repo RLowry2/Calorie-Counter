@@ -107,7 +107,7 @@ public class CaloriesActivity extends AppCompatActivity {
     }
 
     private void loadFoods() {
-        FoodDatabaseHelper db = new FoodDatabaseHelper(this);
+        DatabaseHelper db = new DatabaseHelper(this);
         String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         String selectedDate = today; // Assuming today is the default
 
@@ -153,7 +153,7 @@ public class CaloriesActivity extends AppCompatActivity {
     }
 
     private void onDeleteButtonClicked(FoodEntry entry, int pos) {
-        new FoodDatabaseHelper(this).deleteFood(entry.getId());
+        new DatabaseHelper(this).deleteFood(entry.getId());
         loadFoods();
     }
 }

@@ -19,7 +19,7 @@ public class SetGoalActivity extends AppCompatActivity {
     private EditText goalEditText;
     private Button saveButton;
     private String selectedDate;
-    private FoodDatabaseHelper dbHelper;
+    private DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +41,7 @@ public class SetGoalActivity extends AppCompatActivity {
     private void initializeUI() {
         goalEditText = findViewById(R.id.goalEditText);
         saveButton = findViewById(R.id.saveButton);
-        dbHelper = new FoodDatabaseHelper(this);
+        dbHelper = new DatabaseHelper(this);
 
         // Get date from intent, or default to today
         selectedDate = getIntent().getStringExtra("selectedDate");
