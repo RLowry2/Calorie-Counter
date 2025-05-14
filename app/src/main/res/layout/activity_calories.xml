@@ -59,7 +59,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_margin="24dp"
         android:src="@drawable/ic_menu"
-        android:contentDescription="More options" />
+        android:contentDescription="More options"
+        android:backgroundTint="@color/colorPrimary"
+        android:tint="@android:color/white" />
 </FrameLayout>

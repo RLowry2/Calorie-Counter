@@ -167,7 +167,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // ** EXERCISE ROUTINES METHODS **
 
-    public boolean insertOrUpdateRoutine(String day, String exerciseName, int sets, int reps) {
+    public boolean addExerciseToDay(String day, String exerciseName, int sets, int reps) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COL_DAY, day);

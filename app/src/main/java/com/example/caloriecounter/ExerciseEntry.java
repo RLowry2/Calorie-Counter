@@ -2,43 +2,47 @@ package com.example.caloriecounter;
 
 public class ExerciseEntry {
     private String name;
-    private int sets;
-    private int reps;
+    private boolean isComplete;
+    private int totalSets;
+    private int repsPerSet; // New field
 
-    // Constructor
-    public ExerciseEntry(String name, int sets, int reps) {
+    public ExerciseEntry(String name, int totalSets, int repsPerSet) {
         this.name = name;
-        this.sets = sets;
-        this.reps = reps;
+        this.isComplete = false;
+        this.totalSets = totalSets;
+        this.repsPerSet = repsPerSet;
     }
 
-    // Getter for name
+    // Getters and setters
     public String getName() {
         return name;
     }
 
-    // Setter for name
     public void setName(String name) {
         this.name = name;
     }
 
-    // Getter for sets
-    public int getSets() {
-        return sets;
+    public boolean isComplete() {
+        return isComplete;
     }
 
-    // Setter for sets
-    public void setSets(int sets) {
-        this.sets = sets;
+    public void setComplete(boolean complete) {
+        isComplete = complete;
     }
 
-    // Getter for reps
-    public int getReps() {
-        return reps;
+    public int getTotalSets() {
+        return totalSets;
     }
 
-    // Setter for reps
-    public void setReps(int reps) {
-        this.reps = reps;
+    public void setTotalSets(int totalSets) {
+        this.totalSets = totalSets;
+    }
+
+    public int getRepsPerSet() {
+        return repsPerSet;
+    }
+
+    public void setRepsPerSet(int repsPerSet) {
+        this.repsPerSet = repsPerSet;
     }
 }

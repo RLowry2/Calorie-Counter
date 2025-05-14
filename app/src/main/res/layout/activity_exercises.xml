@@ -1,69 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <!-- Title -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Exercises"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:paddingBottom="8dp" />
-
-    <!-- Day Navigation -->
+    <!-- Main Content Area -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <Button
-            android:id="@+id/previousDayButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="←" />
-
+        <!-- Title -->
         <TextView
-            android:id="@+id/currentDayText"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Monday"
-            android:textSize="18sp"
-            android:paddingHorizontal="16dp"
-            android:gravity="center" />
+            android:text="Exercises"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:paddingBottom="8dp" />
 
-        <Button
-            android:id="@+id/nextDayButton"
-            android:layout_width="wrap_content"
+        <!-- Day Navigation -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="→" />
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/previousDayButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="←" />
+
+            <TextView
+                android:id="@+id/currentDayText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Monday"
+                android:textSize="18sp"
+                android:paddingHorizontal="16dp"
+                android:gravity="center" />
+
+            <Button
+                android:id="@+id/nextDayButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="→" />
+        </LinearLayout>
+
+        <!-- Message for No Exercises -->
+        <TextView
+            android:id="@+id/noExercisesText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No exercises scheduled for today!"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:textColor="#FF0000"
+            android:visibility="gone"
+            android:layout_marginTop="16dp" />
+
+        <!-- RecyclerView for Exercises -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/exerciseRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingTop="16dp" />
+
     </LinearLayout>
-
-    <!-- RecyclerView for Exercises -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/exerciseRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingTop="16dp" />
 
     <!-- Floating Action Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddExercise"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="24dp"
         android:src="@drawable/ic_menu"
         android:contentDescription="Exercise Menu"
         android:backgroundTint="@color/colorPrimary"
         android:tint="@android:color/white" />
 
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
