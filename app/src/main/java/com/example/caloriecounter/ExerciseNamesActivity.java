@@ -40,6 +40,10 @@ public class ExerciseNamesActivity extends AppCompatActivity {
         adapter = new ExerciseNamesAdapter(exerciseNamesList, this::showEditExerciseDialog);
         exerciseNamesRecyclerView.setAdapter(adapter);
 
+        Button addExerciseButton = findViewById(R.id.addExerciseButton);
+        addExerciseButton.setOnClickListener(v -> showAddExerciseDialog());
+
+
         // Load exercise names from the database
         loadExerciseNames();
     }
@@ -121,6 +125,54 @@ public class ExerciseNamesActivity extends AppCompatActivity {
         });
 
         // Show the dialog
+        dialog.show();
+    }
+
+    private void showAddExerciseDialog() {
+        Log.d(TAG, "showAddExerciseDialog: Opening Add Exercise dialog");
+
+        // Inflate a simple layout for the dialog
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_database_add_exercise, null);
+
+        // Initialize dialog components
+        EditText exerciseNameInput = dialogView.findViewById(R.id.exerciseNameInput);
+        Button cancelButton = dialogView.findViewById(R.id.cancelButton);
+        Button saveButton = dialogView.findViewById(R.id.saveButton);
+
+        // Create an AlertDialog
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setCancelable(false) // Prevent dismissal on outside tap
+                .create();
+
+        // Set up Cancel button
+        cancelButton.setOnClickListener(v -> {
+            Log.d(TAG, "showAddExerciseDialog: Cancel action");
+            dialog.dismiss(); // Close the dialog
+        });
+
+        // Set up Save button
+        saveButton.setOnClickListener(v -> {
+            String exerciseName = exerciseNameInput.getText().toString().trim();
+
+            if (!exerciseName.isEmpty()) {
+                boolean isAdded = dbHelper.insertExerciseName(exerciseName);
+
+                if (isAdded) {
+                    Log.d(TAG, "showAddExerciseDialog: Exercise added successfully");
+                    Toast.makeText(this, "Exercise added!", Toast.LENGTH_SHORT).show();
+                    loadExerciseNames(); // Refresh the list
+                } else {
+                    Log.e(TAG, "showAddExerciseDialog: Failed to add exercise");
+                    Toast.makeText(this, "Failed to add exercise!", Toast.LENGTH_SHORT).show();
+                }
+
+                dialog.dismiss(); // Close the dialog
+            } else {
+                Toast.makeText(this, "Exercise name cannot be empty!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         dialog.show();
     }
 }

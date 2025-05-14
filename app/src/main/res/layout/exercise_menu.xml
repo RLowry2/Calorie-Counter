@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_add_exercise"
+        android:title="Add Exercise"
+        android:icon="@drawable/ic_add" />
+    <item
+        android:id="@+id/menu_clear_exercises"
+        android:title="Clear Exercises"
+        android:icon="@drawable/ic_clear" />
+    <item
+        android:id="@+id/menu_show_database"
+        android:title="Show Database"
+        android:icon="@drawable/ic_database" />
+</menu>

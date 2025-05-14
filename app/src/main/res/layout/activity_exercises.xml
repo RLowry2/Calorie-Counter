@@ -62,7 +62,7 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="16dp"
         android:src="@drawable/ic_menu"
-        android:contentDescription="Add Exercise"
+        android:contentDescription="Exercise Menu"
         android:backgroundTint="@color/colorPrimary"
         android:tint="@android:color/white" />
 
