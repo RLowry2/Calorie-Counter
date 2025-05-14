@@ -6,62 +6,65 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <!-- Exercise Name Dropdown -->
+    <!-- Title -->
     <TextView
+        android:id="@+id/dialogTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select Exercise"
-        android:textSize="16sp"
-        android:paddingBottom="8dp" />
+        android:text="Edit Exercise"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:paddingBottom="16dp" />
 
-    <Spinner
-        android:id="@+id/exerciseNameSpinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <!-- Sets Input -->
+    <!-- Exercise Name Input -->
     <EditText
-        android:id="@+id/setsInput"
+        android:id="@+id/editExerciseName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Sets"
-        android:inputType="number"
-        android:paddingTop="16dp" />
+        android:hint="Exercise Name"
+        android:inputType="text"
+        android:paddingBottom="16dp" />
 
-    <!-- Reps Input -->
-    <EditText
-        android:id="@+id/repsInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Reps"
-        android:inputType="number"
-        android:paddingTop="8dp" />
-
-    <!-- Action Buttons -->
+    <!-- Buttons Layout -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="end"
-        android:paddingTop="16dp">
+        android:gravity="end">
 
+        <!-- Delete Button -->
+        <Button
+            android:id="@+id/deleteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete"
+            android:layout_weight="1"
+            android:backgroundTint="@android:color/holo_red_light"
+            android:textColor="@android:color/white" />
+
+        <!-- Spacer -->
+        <Space
+            android:layout_width="16dp"
+            android:layout_height="wrap_content" />
+
+        <!-- Cancel Button -->
         <Button
             android:id="@+id/cancelButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cancel"
+            android:layout_weight="1"
             android:backgroundTint="@android:color/darker_gray"
             android:textColor="@android:color/white" />
 
-        <Space
-            android:layout_width="16dp"
-            android:layout_height="wrap_content" />
-
+        <!-- Confirm Button -->
         <Button
             android:id="@+id/confirmButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Confirm"
+            android:layout_weight="1"
             android:backgroundTint="@android:color/holo_green_light"
             android:textColor="@android:color/white" />
     </LinearLayout>

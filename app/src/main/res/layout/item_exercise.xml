@@ -1,31 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:background="?attr/selectableItemBackground">
 
+    <!-- Exercise Name -->
     <TextView
-        android:id="@+id/exerciseNameTextView"
+        android:id="@+id/exerciseNameText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Exercise Name"
         android:textSize="18sp"
-        android:padding="4dp" />
+        android:textStyle="bold"
+        android:paddingBottom="4dp" />
 
+    <!-- Sets/Reps -->
     <TextView
-        android:id="@+id/setsTextView"
+        android:id="@+id/setsRepsText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Sets"
-        android:textSize="16sp"
-        android:padding="4dp" />
+        android:text="Sets: 3 Reps: 10"
+        android:textSize="14sp"
+        android:paddingBottom="8dp" />
 
-    <TextView
-        android:id="@+id/repsTextView"
+    <!-- Checkbox List for Sets -->
+    <LinearLayout
+        android:id="@+id/checkboxContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Reps"
-        android:textSize="16sp"
-        android:padding="4dp" />
+        android:orientation="vertical">
+        <!-- Checkboxes will be added dynamically -->
+    </LinearLayout>
 </LinearLayout>

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -5,30 +6,64 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <Button
-        android:id="@+id/addExerciseButton"
+    <!-- Title -->
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Exercise" />
+        android:text="Exercises"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingBottom="8dp" />
 
-    <Button
-        android:id="@+id/clearExercisesButton"
+    <!-- Day Navigation -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Clear Exercises"
-        android:layout_marginTop="8dp" />
+        android:orientation="horizontal"
+        android:gravity="center">
 
-    <Button
-        android:id="@+id/databaseButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Database"
-        android:layout_marginTop="16dp" />
+        <Button
+            android:id="@+id/previousDayButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="←" />
 
+        <TextView
+            android:id="@+id/currentDayText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Monday"
+            android:textSize="18sp"
+            android:paddingHorizontal="16dp"
+            android:gravity="center" />
+
+        <Button
+            android:id="@+id/nextDayButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="→" />
+    </LinearLayout>
+
+    <!-- RecyclerView for Exercises -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/exerciseRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:paddingTop="16dp" />
+
+    <!-- Floating Action Button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddExercise"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_menu"
+        android:contentDescription="Add Exercise"
+        android:backgroundTint="@color/colorPrimary"
+        android:tint="@android:color/white" />
 
 </LinearLayout>

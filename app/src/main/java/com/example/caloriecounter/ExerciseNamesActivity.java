@@ -2,6 +2,7 @@ package com.example.caloriecounter;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -22,7 +23,6 @@ public class ExerciseNamesActivity extends AppCompatActivity {
     private ExerciseNamesAdapter adapter;
     private List<String> exerciseNamesList;
     private DatabaseHelper dbHelper;
-    private Button addExerciseButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,15 +37,11 @@ public class ExerciseNamesActivity extends AppCompatActivity {
         exerciseNamesList = new ArrayList<>();
         exerciseNamesRecyclerView = findViewById(R.id.exerciseNamesRecyclerView);
         exerciseNamesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ExerciseNamesAdapter(exerciseNamesList);
+        adapter = new ExerciseNamesAdapter(exerciseNamesList, this::showEditExerciseDialog);
         exerciseNamesRecyclerView.setAdapter(adapter);
 
         // Load exercise names from the database
         loadExerciseNames();
-
-        // Add Exercise Button
-        addExerciseButton = findViewById(R.id.addExerciseButton);
-        addExerciseButton.setOnClickListener(v -> openAddExerciseDialog());
     }
 
     private void loadExerciseNames() {
@@ -54,51 +50,77 @@ public class ExerciseNamesActivity extends AppCompatActivity {
         exerciseNamesList.addAll(dbHelper.getExerciseNames());
 
         Log.d(TAG, "loadExerciseNames: Loaded " + exerciseNamesList.size() + " exercises");
-        for (String name : exerciseNamesList) {
-            Log.d(TAG, "loadExerciseNames: Exercise: " + name);
-        }
-
         adapter.notifyDataSetChanged();
     }
 
-    private void openAddExerciseDialog() {
-        Log.d(TAG, "openAddExerciseDialog: Opening Add Exercise dialog");
+    private void showEditExerciseDialog(String oldName) {
+        Log.d(TAG, "showEditExerciseDialog: Editing exercise - " + oldName);
 
-        // Create an AlertDialog for user input
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add Exercise");
+        // Inflate the custom layout
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_exercise, null);
 
-        // Set up the input field
-        final EditText input = new EditText(this);
-        input.setHint("Exercise Name");
-        builder.setView(input);
+        // Initialize dialog components
+        EditText editExerciseName = dialogView.findViewById(R.id.editExerciseName);
+        Button deleteButton = dialogView.findViewById(R.id.deleteButton);
+        Button cancelButton = dialogView.findViewById(R.id.cancelButton);
+        Button confirmButton = dialogView.findViewById(R.id.confirmButton);
 
-        // Set up the buttons
-        builder.setPositiveButton("Save", (dialog, which) -> {
-            String exerciseName = input.getText().toString().trim();
+        // Pre-fill the EditText with the current exercise name
+        editExerciseName.setText(oldName);
 
-            if (!exerciseName.isEmpty()) {
-                boolean isSaved = dbHelper.insertExerciseName(exerciseName);
+        // Create an AlertDialog
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setCancelable(false) // Prevent dismissal on outside tap
+                .create();
 
-                if (isSaved) {
-                    Log.d(TAG, "openAddExerciseDialog: Exercise added successfully");
-                    Toast.makeText(this, "Exercise added!", Toast.LENGTH_SHORT).show();
+        // Set up Delete button
+        deleteButton.setOnClickListener(v -> {
+            Log.d(TAG, "showEditExerciseDialog: Deleting exercise - " + oldName);
+            boolean isDeleted = dbHelper.deleteExerciseName(oldName);
+
+            if (isDeleted) {
+                Log.d(TAG, "showEditExerciseDialog: Exercise deleted successfully");
+                Toast.makeText(this, "Exercise deleted!", Toast.LENGTH_SHORT).show();
+                loadExerciseNames(); // Refresh the list
+            } else {
+                Log.e(TAG, "showEditExerciseDialog: Failed to delete exercise");
+                Toast.makeText(this, "Failed to delete exercise!", Toast.LENGTH_SHORT).show();
+            }
+
+            dialog.dismiss(); // Close the dialog
+        });
+
+        // Set up Cancel button
+        cancelButton.setOnClickListener(v -> {
+            Log.d(TAG, "showEditExerciseDialog: Cancel action");
+            dialog.dismiss(); // Close the dialog
+        });
+
+        // Set up Confirm button
+        confirmButton.setOnClickListener(v -> {
+            String newName = editExerciseName.getText().toString().trim();
+
+            if (!newName.isEmpty()) {
+                boolean isUpdated = dbHelper.updateExerciseName(oldName, newName);
+
+                if (isUpdated) {
+                    Log.d(TAG, "showEditExerciseDialog: Exercise updated successfully");
+                    Toast.makeText(this, "Exercise updated!", Toast.LENGTH_SHORT).show();
                     loadExerciseNames(); // Refresh the list
                 } else {
-                    Log.e(TAG, "openAddExerciseDialog: Failed to add exercise");
-                    Toast.makeText(this, "Failed to add exercise!", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "showEditExerciseDialog: Failed to update exercise");
+                    Toast.makeText(this, "Failed to update exercise!", Toast.LENGTH_SHORT).show();
                 }
+
+                dialog.dismiss(); // Close the dialog
             } else {
-                Log.w(TAG, "openAddExerciseDialog: Exercise name is empty");
+                Log.w(TAG, "showEditExerciseDialog: New exercise name is empty");
                 Toast.makeText(this, "Exercise name cannot be empty!", Toast.LENGTH_SHORT).show();
             }
         });
 
-        builder.setNegativeButton("Cancel", (dialog, which) -> {
-            Log.d(TAG, "openAddExerciseDialog: Dialog canceled");
-            dialog.cancel();
-        });
-
-        builder.show();
+        // Show the dialog
+        dialog.show();
     }
 }

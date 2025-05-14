@@ -12,24 +12,30 @@ import java.util.List;
 
 public class ExerciseNamesAdapter extends RecyclerView.Adapter<ExerciseNamesAdapter.ViewHolder> {
 
-    private List<String> exerciseNamesList;
+    private final List<String> exerciseNamesList;
+    private final OnExerciseLongPressListener longPressListener;
 
-    public ExerciseNamesAdapter(List<String> exerciseNamesList) {
+    public interface OnExerciseLongPressListener {
+        void onLongPress(String exerciseName);
+    }
+
+    public ExerciseNamesAdapter(List<String> exerciseNamesList, OnExerciseLongPressListener longPressListener) {
         this.exerciseNamesList = exerciseNamesList;
+        this.longPressListener = longPressListener;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_exercise_name, parent, false); // Ensure this matches your layout
+                .inflate(R.layout.item_exercise_name, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String exerciseName = exerciseNamesList.get(position);
-        holder.exerciseNameTextView.setText(exerciseName);
+        holder.bind(exerciseName);
     }
 
     @Override
@@ -37,12 +43,20 @@ public class ExerciseNamesAdapter extends RecyclerView.Adapter<ExerciseNamesAdap
         return exerciseNamesList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView exerciseNameTextView;
+    class ViewHolder extends RecyclerView.ViewHolder {
+        private final TextView exerciseNameTextView;
 
-        public ViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
-            exerciseNameTextView = itemView.findViewById(R.id.exerciseNameTextView); // Ensure the ID matches the XML
+            exerciseNameTextView = itemView.findViewById(R.id.exerciseNameTextView);
+        }
+
+        void bind(String exerciseName) {
+            exerciseNameTextView.setText(exerciseName);
+            itemView.setOnLongClickListener(v -> {
+                longPressListener.onLongPress(exerciseName);
+                return true;
+            });
         }
     }
 }

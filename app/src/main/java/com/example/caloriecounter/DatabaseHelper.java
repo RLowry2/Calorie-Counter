@@ -186,7 +186,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public List<ExerciseEntry> getRoutinesForDay(String day) {
+    public List<ExerciseEntry> getExercisesForDay(String day) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(ROUTINES_TBL,
                 new String[]{COL_EXERCISE_NAME, COL_SETS, COL_REPS},
@@ -206,7 +206,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return routines;
     }
 
-    public int clearRoutinesForDay(String day) {
+    public int clearExercisesForDay(String day) {
         SQLiteDatabase db = getWritableDatabase();
         int rowsDeleted = db.delete(ROUTINES_TBL, COL_DAY + " = ?", new String[]{day});
         db.close();
@@ -238,5 +238,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return exerciseNames;
+    }
+
+    public boolean updateExerciseName(String oldName, String newName) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_EXERCISE_NAME, newName);
+
+        // Update the exercise name where the old name matches
+        int rowsAffected = db.update(EXERCISE_NAMES_TBL, values, COL_EXERCISE_NAME + " = ?", new String[]{oldName});
+        db.close();
+
+        return rowsAffected > 0;
+    }
+
+    public boolean deleteExerciseName(String exerciseName) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        // Delete the exercise where the name matches
+        int rowsAffected = db.delete(EXERCISE_NAMES_TBL, COL_EXERCISE_NAME + " = ?", new String[]{exerciseName});
+        db.close();
+
+        return rowsAffected > 0;
     }
 }

@@ -1,17 +1,29 @@
 package com.example.caloriecounter;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.PopupMenu;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class ExercisesActivity extends AppCompatActivity {
 
@@ -21,9 +33,10 @@ public class ExercisesActivity extends AppCompatActivity {
     private ExerciseAdapter adapter;
     private List<ExerciseEntry> exerciseList;
     private DatabaseHelper dbHelper;
-    private Button addExerciseButton;
-    private Button clearExercisesButton;
-    private Button databaseButton;
+    private TextView currentDayText;
+
+    private Calendar calendar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,48 +49,239 @@ public class ExercisesActivity extends AppCompatActivity {
         dbHelper = new DatabaseHelper(this);
 
         // Initialize RecyclerView and list
-        exerciseList = new ArrayList<>();
         exerciseRecyclerView = findViewById(R.id.exerciseRecyclerView);
         exerciseRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ExerciseAdapter(exerciseList);
-        exerciseRecyclerView.setAdapter(adapter);
 
-        // Load exercises for today's day (e.g., "Monday")
-        String currentDay = "Monday"; // Replace with logic to get the actual day
-        loadExercisesForToday(currentDay);
+        // Initialize Calendar for day navigation
+        calendar = Calendar.getInstance();
+        updateDayText();
 
-        // Add Exercise Button
-        addExerciseButton = findViewById(R.id.addExerciseButton);
-        addExerciseButton.setOnClickListener(v -> openAddExerciseDialog(currentDay));
+        // Load exercises for today's day
+        loadExercisesForToday();
 
-        // Clear Exercises Button
-        clearExercisesButton = findViewById(R.id.clearExercisesButton);
-        clearExercisesButton.setOnClickListener(v -> clearExercisesForToday(currentDay));
-
-        // Database Button
-        databaseButton = findViewById(R.id.databaseButton);
-        databaseButton.setOnClickListener(v -> {
-            Log.d(TAG, "onClick: Database button clicked. Navigating to ExerciseNamesActivity");
-            Intent intent = new Intent(ExercisesActivity.this, ExerciseNamesActivity.class);
-            startActivity(intent);
+        // Set up Previous Day Button
+        Button previousDayButton = findViewById(R.id.previousDayButton);
+        previousDayButton.setOnClickListener(v -> {
+            calendar.add(Calendar.DAY_OF_YEAR, -1);
+            updateDayText();
+            loadExercisesForToday();
         });
+
+        // Set up Next Day Button
+        Button nextDayButton = findViewById(R.id.nextDayButton);
+        nextDayButton.setOnClickListener(v -> {
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+            updateDayText();
+            loadExercisesForToday();
+        });
+
+        // Find the FAB by ID
+        FloatingActionButton fabAddExercise = findViewById(R.id.fabAddExercise);
+
+        // Set the click listener
+        fabAddExercise.setOnClickListener(v -> {
+            Log.d(TAG, "FAB clicked. Opening Add Exercise dialog.");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMM dd", Locale.getDefault());
+            String currentDay = dateFormat.format(calendar.getTime());
+            showAddExerciseDialog(currentDay); // Assuming showAddExerciseDialog is implemented
+        });
+    }
+
+    private void showAddExerciseDialog(String currentDay) {
+        Log.d(TAG, "showAddExerciseDialog: Opening Add Exercise dialog");
+
+        // Fetch exercise names from the database
+        List<String> exerciseNames = dbHelper.getExerciseNames();
+
+        // Inflate the custom layout
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_exercise, null);
+
+        // Initialize dialog components
+        Spinner exerciseNameSpinner = dialogView.findViewById(R.id.exerciseNameSpinner);
+        EditText setsInput = dialogView.findViewById(R.id.setsInput);
+        EditText repsInput = dialogView.findViewById(R.id.repsInput);
+        Button cancelButton = dialogView.findViewById(R.id.cancelButton);
+        Button confirmButton = dialogView.findViewById(R.id.confirmButton);
+
+        // Populate the Spinner with exercise names
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, exerciseNames);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        exerciseNameSpinner.setAdapter(adapter);
+
+        // Create an AlertDialog
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setCancelable(false) // Prevent dismissal on outside tap
+                .create();
+
+        // Set up Cancel button
+        cancelButton.setOnClickListener(v -> {
+            Log.d(TAG, "showAddExerciseDialog: Cancel action");
+            dialog.dismiss(); // Close the dialog
+        });
+
+        // Set up Confirm button
+        confirmButton.setOnClickListener(v -> {
+            String selectedExercise = exerciseNameSpinner.getSelectedItem().toString();
+            String sets = setsInput.getText().toString().trim();
+            String reps = repsInput.getText().toString().trim();
+
+            if (!sets.isEmpty() && !reps.isEmpty()) {
+                int setsCount = Integer.parseInt(sets);
+                int repsCount = Integer.parseInt(reps);
+
+                // Insert the exercise into the database
+                boolean isInserted = dbHelper.insertOrUpdateRoutine(currentDay, selectedExercise, setsCount, repsCount);
+
+                if (isInserted) {
+                    Log.d(TAG, "showAddExerciseDialog: Exercise added successfully");
+                    Toast.makeText(this, "Exercise added!", Toast.LENGTH_SHORT).show();
+                    loadExercisesForToday(currentDay); // Refresh the list
+                } else {
+                    Log.e(TAG, "showAddExerciseDialog: Failed to add exercise");
+                    Toast.makeText(this, "Failed to add exercise!", Toast.LENGTH_SHORT).show();
+                }
+
+                dialog.dismiss(); // Close the dialog
+            } else {
+                Log.w(TAG, "showAddExerciseDialog: Sets or reps are empty");
+                Toast.makeText(this, "Sets and reps cannot be empty!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Show the dialog
+        dialog.show();
+    }
+
+    private void updateDayText() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMM dd", Locale.getDefault());
+        String currentDay = dateFormat.format(calendar.getTime());
+        currentDayText = findViewById(R.id.currentDayText);
+        currentDayText.setText(currentDay);
+    }
+
+    private void loadExercisesForToday() {
+        SimpleDateFormat dbDateFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
+        String dayForDatabase = dbDateFormat.format(calendar.getTime());
+
+        Log.d(TAG, "loadExercisesForToday: Loading exercises for " + dayForDatabase);
+        exerciseList = dbHelper.getExercisesForDay(dayForDatabase);
+
+        // Initialize or update the adapter
+        if (adapter == null) {
+            adapter = new ExerciseAdapter(exerciseList);
+            exerciseRecyclerView.setAdapter(adapter);
+        } else {
+            adapter.updateExercises(exerciseList);
+        }
+    }
+
+    private void showPopupMenu(View anchor, String day) {
+        PopupMenu popup = new PopupMenu(this, anchor);
+        popup.getMenu().add(0, 1, 0, "Add Exercise");
+        popup.getMenu().add(0, 2, 1, "Clear Exercises");
+        popup.getMenu().add(0, 3, 2, "Database");
+
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case 1: // Add Exercise
+                    openAddExerciseDialog(day);
+                    return true;
+                case 2: // Clear Exercises
+                    clearExercisesForToday(day);
+                    return true;
+                case 3: // Database
+                    navigateToDatabase();
+                    return true;
+                default:
+                    return false;
+            }
+        });
+        popup.show();
+    }
+
+    private void navigateToDatabase() {
+        Log.d(TAG, "navigateToDatabase: Navigating to ExerciseNamesActivity");
+        Intent intent = new Intent(this, ExerciseNamesActivity.class);
+        startActivity(intent);
     }
 
     private void loadExercisesForToday(String day) {
         Log.d(TAG, "loadExercisesForToday: Loading exercises for " + day);
         exerciseList.clear();
-        exerciseList.addAll(dbHelper.getRoutinesForDay(day)); // Fetch exercises for the day
+        exerciseList.addAll(dbHelper.getExercisesForDay(day)); // Fetch exercises for the day
         adapter.notifyDataSetChanged();
     }
 
     private void openAddExerciseDialog(String currentDay) {
         Log.d(TAG, "openAddExerciseDialog: Opening Add Exercise dialog");
-        // Implementation of Add Exercise Dialog
+
+        // Fetch exercise names from the database
+        List<String> exerciseNames = dbHelper.getExerciseNames();
+
+        // Inflate the custom layout
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_exercise, null);
+
+        // Initialize dialog components
+        Spinner exerciseNameSpinner = dialogView.findViewById(R.id.exerciseNameSpinner);
+        EditText setsInput = dialogView.findViewById(R.id.setsInput);
+        EditText repsInput = dialogView.findViewById(R.id.repsInput);
+        Button cancelButton = dialogView.findViewById(R.id.cancelButton);
+        Button confirmButton = dialogView.findViewById(R.id.confirmButton);
+
+        // Populate the Spinner with exercise names
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, exerciseNames);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        exerciseNameSpinner.setAdapter(adapter);
+
+        // Create an AlertDialog
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setCancelable(false) // Prevent dismissal on outside tap
+                .create();
+
+        // Set up Cancel button
+        cancelButton.setOnClickListener(v -> {
+            Log.d(TAG, "openAddExerciseDialog: Cancel action");
+            dialog.dismiss(); // Close the dialog
+        });
+
+        // Set up Confirm button
+        confirmButton.setOnClickListener(v -> {
+            String selectedExercise = exerciseNameSpinner.getSelectedItem().toString();
+            String sets = setsInput.getText().toString().trim();
+            String reps = repsInput.getText().toString().trim();
+
+            if (!sets.isEmpty() && !reps.isEmpty()) {
+                int setsCount = Integer.parseInt(sets);
+                int repsCount = Integer.parseInt(reps);
+
+                // Insert the exercise into the database
+                boolean isInserted = dbHelper.insertOrUpdateRoutine(currentDay, selectedExercise, setsCount, repsCount);
+
+                if (isInserted) {
+                    Log.d(TAG, "openAddExerciseDialog: Exercise added successfully");
+                    Toast.makeText(this, "Exercise added!", Toast.LENGTH_SHORT).show();
+                    loadExercisesForToday(currentDay); // Refresh the list
+                } else {
+                    Log.e(TAG, "openAddExerciseDialog: Failed to add exercise");
+                    Toast.makeText(this, "Failed to add exercise!", Toast.LENGTH_SHORT).show();
+                }
+
+                dialog.dismiss(); // Close the dialog
+            } else {
+                Log.w(TAG, "openAddExerciseDialog: Sets or reps are empty");
+                Toast.makeText(this, "Sets and reps cannot be empty!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Show the dialog
+        dialog.show();
     }
 
     private void clearExercisesForToday(String day) {
         Log.d(TAG, "clearExercisesForToday: Clearing exercises for " + day);
-        int rowsDeleted = dbHelper.clearRoutinesForDay(day);
+        int rowsDeleted = dbHelper.clearExercisesForDay(day);
 
         if (rowsDeleted > 0) {
             Log.d(TAG, "clearExercisesForToday: Cleared " + rowsDeleted + " exercises");
@@ -89,4 +293,5 @@ public class ExercisesActivity extends AppCompatActivity {
 
         loadExercisesForToday(day); // Refresh the RecyclerView after clearing
     }
+
 }

@@ -4,6 +4,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.ViewHolder> {
+public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.ExerciseViewHolder> {
 
     private List<ExerciseEntry> exerciseList;
 
@@ -19,23 +21,27 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.ViewHo
         this.exerciseList = exerciseList;
     }
 
-    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ExerciseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_exercise_entry, parent, false); // Use item_exercise_entry layout
-        return new ViewHolder(view);
+                .inflate(R.layout.item_exercise, parent, false);
+        return new ExerciseViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(ExerciseViewHolder holder, int position) {
         ExerciseEntry exercise = exerciseList.get(position);
-        if (holder.exerciseNameTextView == null) {
-            Log.e("ExerciseAdapter", "exerciseNameTextView is null");
+
+        holder.exerciseNameText.setText(exercise.getName());
+        holder.setsRepsText.setText("Sets: " + exercise.getSets() + " Reps: " + exercise.getReps());
+
+        // Add checkboxes for each set
+        holder.checkboxContainer.removeAllViews();
+        for (int i = 1; i <= exercise.getSets(); i++) {
+            CheckBox checkBox = new CheckBox(holder.itemView.getContext());
+            checkBox.setText("Set " + i);
+            holder.checkboxContainer.addView(checkBox);
         }
-        holder.exerciseNameTextView.setText(exercise.getName());
-        holder.setsTextView.setText("Sets: " + exercise.getSets());
-        holder.repsTextView.setText("Reps: " + exercise.getReps());
     }
 
     @Override
@@ -43,16 +49,20 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.ViewHo
         return exerciseList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView exerciseNameTextView;
-        TextView setsTextView;
-        TextView repsTextView;
+    public void updateExercises(List<ExerciseEntry> newExercises) {
+        this.exerciseList = newExercises;
+        notifyDataSetChanged();
+    }
 
-        public ViewHolder(@NonNull View itemView) {
+    static class ExerciseViewHolder extends RecyclerView.ViewHolder {
+        TextView exerciseNameText, setsRepsText;
+        LinearLayout checkboxContainer;
+
+        public ExerciseViewHolder(View itemView) {
             super(itemView);
-            exerciseNameTextView = itemView.findViewById(R.id.exerciseNameTextView);
-            setsTextView = itemView.findViewById(R.id.setsTextView);
-            repsTextView = itemView.findViewById(R.id.repsTextView);
+            exerciseNameText = itemView.findViewById(R.id.exerciseNameText);
+            setsRepsText = itemView.findViewById(R.id.setsRepsText);
+            checkboxContainer = itemView.findViewById(R.id.checkboxContainer);
         }
     }
 }
