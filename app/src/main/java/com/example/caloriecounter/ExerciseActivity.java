@@ -63,14 +63,16 @@ public class ExerciseActivity extends AppCompatActivity implements ExerciseAdapt
         loadExercisesForToday(currentDay);
 
         // Set up Previous Day Button
-        ImageButton previousDayButton = findViewById(R.id.previousDayButton);        previousDayButton.setOnClickListener(v -> {
+        ImageButton previousDayButton = findViewById(R.id.previousDayButton);
+        previousDayButton.setOnClickListener(v -> {
             calendar.add(Calendar.DAY_OF_YEAR, -1); // Move back one day
             updateDayText();
             loadExercisesForToday(currentDay);
         });
 
         // Set up Next Day Button
-        ImageButton nextDayButton = findViewById(R.id.nextDayButton);        nextDayButton.setOnClickListener(v -> {
+        ImageButton nextDayButton = findViewById(R.id.nextDayButton);
+        nextDayButton.setOnClickListener(v -> {
             calendar.add(Calendar.DAY_OF_YEAR, 1); // Move forward one day
             updateDayText();
             loadExercisesForToday(currentDay);
@@ -113,6 +115,7 @@ public class ExerciseActivity extends AppCompatActivity implements ExerciseAdapt
         Intent intent = new Intent(this, ExerciseNamesActivity.class);
         startActivity(intent);
     }
+
     private void updateDayText() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
         currentDay = dateFormat.format(calendar.getTime()); // Format the current day
@@ -137,6 +140,7 @@ public class ExerciseActivity extends AppCompatActivity implements ExerciseAdapt
         AutoCompleteTextView exerciseNameAutocomplete = dialogView.findViewById(R.id.exercise_name_autocomplete);
         EditText setsInput = dialogView.findViewById(R.id.setsInput);
         EditText repsInput = dialogView.findViewById(R.id.repsInput);
+        EditText weightInput = dialogView.findViewById(R.id.weightInput); // New weight field
         Button cancelButton = dialogView.findViewById(R.id.cancelButton);
         Button confirmButton = dialogView.findViewById(R.id.confirmButton);
 
@@ -162,15 +166,16 @@ public class ExerciseActivity extends AppCompatActivity implements ExerciseAdapt
             String selectedExercise = exerciseNameAutocomplete.getText().toString().trim();
             String sets = setsInput.getText().toString().trim();
             String reps = repsInput.getText().toString().trim();
+            String weight = weightInput.getText().toString().trim(); // New weight input
 
-            if (!sets.isEmpty() && !reps.isEmpty()) {
+            if (!sets.isEmpty() && !reps.isEmpty() && !weight.isEmpty()) {
                 // Add the exercise to the database
                 boolean isAdded = dbHelper.addExerciseToDay(
                         currentDay,
                         selectedExercise,
                         Integer.parseInt(sets),
                         Integer.parseInt(reps),
-                        0.0, // Default weight
+                        Double.parseDouble(weight), // Save weight
                         "lbs" // Default unit
                 );
                 if (isAdded) {
@@ -184,7 +189,7 @@ public class ExerciseActivity extends AppCompatActivity implements ExerciseAdapt
 
                 dialog.dismiss(); // Close the dialog
             } else {
-                Toast.makeText(this, "Sets and Reps cannot be empty!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "All fields must be filled!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -212,8 +217,7 @@ public class ExerciseActivity extends AppCompatActivity implements ExerciseAdapt
                 .setMessage("Are you sure you want to delete this exercise?")
                 .setPositiveButton("Yes", (dialog, which) -> {
                     // Remove the exercise from the database
-                    ExerciseEntry exerciseToDelete = new ExerciseEntry("Push Ups", 3, 10, 0.0, "lbs");
-                    exerciseToDelete.setDay("Monday"); // Set the day of the exercise
+                    ExerciseEntry exerciseToDelete = exerciseList.get(position);
                     boolean isDeleted = dbHelper.deleteExercise(exerciseToDelete);
 
                     if (isDeleted) {

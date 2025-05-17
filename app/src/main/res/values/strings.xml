@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Calorie Counter</string>
+
+    <string-array name="weight_units">
+        <item>lbs</item>
+        <item>kg</item>
+    </string-array>
 </resources>

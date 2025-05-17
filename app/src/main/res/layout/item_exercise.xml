@@ -38,7 +38,7 @@
         android:paddingTop="4dp"
         android:textColor="#555555" />
 
-    <!-- Dynamic Set Checkboxes -->
+    <!-- Dynamic Set Checkboxes with Editable Weight and Spinner -->
     <LinearLayout
         android:id="@+id/setsContainer"
         android:layout_width="match_parent"
@@ -54,32 +54,31 @@
             android:gravity="center_vertical"
             android:paddingTop="8dp">
 
-            <!-- Weight Input -->
+            <!-- Set Checkbox -->
+            <CheckBox
+                android:id="@+id/setCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <!-- Editable Weight Input -->
             <EditText
-                android:id="@+id/weightInput"
+                android:id="@+id/setWeightInput"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Weight"
+                android:hint="Enter weight"
                 android:inputType="numberDecimal"
-                android:padding="8dp"
-                android:background="@android:drawable/edit_text"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp" />
 
-            <!-- Unit Selector -->
+            <!-- Unit Selector Spinner -->
             <Spinner
                 android:id="@+id/unitSpinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:padding="8dp" />
-
-            <!-- Set Checkbox -->
-            <CheckBox
-                android:id="@+id/setCheckbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp" />
+                android:entries="@array/weight_units" />
         </LinearLayout>
 
     </LinearLayout>
