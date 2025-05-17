@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,9 +15,12 @@ import java.util.List;
 public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.ExerciseViewHolder> {
 
     private final List<ExerciseEntry> exerciseList;
+    private final OnExerciseLongClickListener longClickListener;
 
-    public ExerciseAdapter(List<ExerciseEntry> exerciseList) {
+    // Constructor with the long click listener
+    public ExerciseAdapter(List<ExerciseEntry> exerciseList, OnExerciseLongClickListener longClickListener) {
         this.exerciseList = exerciseList;
+        this.longClickListener = longClickListener;
     }
 
     @NonNull
@@ -33,26 +37,65 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
         // Set exercise name
         holder.exerciseName.setText(exercise.getName());
 
-        // Ensure all checkboxes are unchecked when the app is opened
-        holder.exerciseCheckbox.setChecked(false);
-        holder.setCheckbox1.setChecked(false);
-        holder.setCheckbox2.setChecked(false);
+        // Dynamically set the total sets and reps
+        String setsRepsText = exercise.getTotalSets() + " Sets x " + exercise.getRepsPerSet() + " Reps";
+        holder.exerciseSetsReps.setText(setsRepsText);
 
-        // Listener for child checkboxes (sets)
-        holder.setCheckbox1.setOnCheckedChangeListener((buttonView, isChecked) -> updateParentCheckbox(holder));
-        holder.setCheckbox2.setOnCheckedChangeListener((buttonView, isChecked) -> updateParentCheckbox(holder));
+        // Ensure parent checkbox is unchecked when the app is opened
+        holder.exerciseCheckbox.setChecked(false);
+
+        // Clear any existing views in the sets container (to handle recycling)
+        holder.setsContainer.removeAllViews();
+
+        // Dynamically add checkboxes for each set
+        for (int i = 1; i <= exercise.getTotalSets(); i++) {
+            CheckBox setCheckbox = new CheckBox(holder.setsContainer.getContext());
+            setCheckbox.setText("Set " + i);
+            setCheckbox.setChecked(false); // Default to unchecked
+
+            // Listener for individual checkboxes
+            setCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                // Update parent checkbox state based on child checkboxes
+                updateParentCheckbox(holder);
+            });
+
+            holder.setsContainer.addView(setCheckbox);
+        }
 
         // Listener for parent checkbox (exercise)
         holder.exerciseCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             // If parent checkbox is checked, mark all sets as complete
-            holder.setCheckbox1.setChecked(isChecked);
-            holder.setCheckbox2.setChecked(isChecked);
+            for (int i = 0; i < holder.setsContainer.getChildCount(); i++) {
+                View child = holder.setsContainer.getChildAt(i);
+                if (child instanceof CheckBox) {
+                    ((CheckBox) child).setChecked(isChecked);
+                }
+            }
+        });
+
+        // Long press to delete the exercise
+        holder.itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) {
+                longClickListener.onExerciseLongClicked(position);
+                return true;
+            }
+            return false;
         });
     }
 
     private void updateParentCheckbox(ExerciseViewHolder holder) {
-        // If all child (set) checkboxes are checked, check the parent (exercise) checkbox
-        boolean allSetsComplete = holder.setCheckbox1.isChecked() && holder.setCheckbox2.isChecked();
+        // Check if all child checkboxes are checked
+        boolean allSetsComplete = true;
+
+        for (int i = 0; i < holder.setsContainer.getChildCount(); i++) {
+            View child = holder.setsContainer.getChildAt(i);
+            if (child instanceof CheckBox && !((CheckBox) child).isChecked()) {
+                allSetsComplete = false;
+                break;
+            }
+        }
+
+        // Update parent checkbox based on child checkboxes
         holder.exerciseCheckbox.setChecked(allSetsComplete);
     }
 
@@ -63,16 +106,21 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
 
     public static class ExerciseViewHolder extends RecyclerView.ViewHolder {
         TextView exerciseName;
+        TextView exerciseSetsReps;
         CheckBox exerciseCheckbox;
-        CheckBox setCheckbox1;
-        CheckBox setCheckbox2;
+        LinearLayout setsContainer;
 
         public ExerciseViewHolder(@NonNull View itemView) {
             super(itemView);
             exerciseName = itemView.findViewById(R.id.exerciseName);
+            exerciseSetsReps = itemView.findViewById(R.id.exerciseSetsReps);
             exerciseCheckbox = itemView.findViewById(R.id.exerciseCheckbox);
-            setCheckbox1 = itemView.findViewById(R.id.setCheckbox1);
-            setCheckbox2 = itemView.findViewById(R.id.setCheckbox2);
+            setsContainer = itemView.findViewById(R.id.setsContainer);
         }
+    }
+
+    // Callback interface for long click
+    public interface OnExerciseLongClickListener {
+        void onExerciseLongClicked(int position);
     }
 }

@@ -46,32 +46,5 @@ public class RoutineDayFragment extends Fragment {
         exerciseContainer.addView(exerciseEntry);
     }
 
-    public List<ExerciseEntry> getExercises() {
-        List<ExerciseEntry> exercises = new ArrayList<>();
-        for (int i = 0; i < exerciseContainer.getChildCount(); i++) {
-            View exerciseEntry = exerciseContainer.getChildAt(i);
-            EditText nameInput = exerciseEntry.findViewById(R.id.exerciseNameTextView);
-            EditText setsInput = exerciseEntry.findViewById(R.id.setsTextView);
-            EditText repsInput = exerciseEntry.findViewById(R.id.repsTextView);
 
-            String name = nameInput.getText().toString().trim();
-            String setsStr = setsInput.getText().toString().trim();
-            String repsStr = repsInput.getText().toString().trim();
-
-            if (name.isEmpty() || setsStr.isEmpty() || repsStr.isEmpty()) {
-                // Skip this entry if any field is empty
-                continue;
-            }
-
-            try {
-                int sets = Integer.parseInt(setsStr);
-                int reps = Integer.parseInt(repsStr);
-                exercises.add(new ExerciseEntry(name, sets, reps));
-            } catch (NumberFormatException e) {
-                // Log or handle invalid number input
-                e.printStackTrace();
-            }
-        }
-        return exercises;
-    }
 }

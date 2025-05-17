@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -28,11 +29,13 @@
             android:orientation="horizontal"
             android:gravity="center">
 
-            <Button
+            <ImageButton
                 android:id="@+id/previousDayButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="←" />
+                android:src="@drawable/ic_previous"
+                android:contentDescription="Previous Day"
+                android:background="?attr/selectableItemBackground" />
 
             <TextView
                 android:id="@+id/currentDayText"
@@ -43,11 +46,13 @@
                 android:paddingHorizontal="16dp"
                 android:gravity="center" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/nextDayButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="→" />
+                android:src="@drawable/ic_next"
+                android:contentDescription="Next Day"
+                android:background="?attr/selectableItemBackground" />
         </LinearLayout>
 
         <!-- Message for No Exercises -->
@@ -58,7 +63,7 @@
             android:text="No exercises scheduled for today!"
             android:textSize="16sp"
             android:gravity="center"
-            android:textColor="#FF0000"
+            android:textColor="#808080"
             android:visibility="gone"
             android:layout_marginTop="16dp" />
 
@@ -69,7 +74,6 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:paddingTop="16dp" />
-
     </LinearLayout>
 
     <!-- Floating Action Button -->
@@ -79,9 +83,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="24dp"
-        android:src="@drawable/ic_menu"
-        android:contentDescription="Exercise Menu"
-        android:backgroundTint="@color/colorPrimary"
-        android:tint="@android:color/white" />
-
+        app:srcCompat="@drawable/ic_add"
+        android:contentDescription="Add Exercise"
+        app:backgroundTint="@color/colorPrimary"
+        app:tint="@android:color/white" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

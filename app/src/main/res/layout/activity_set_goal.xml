@@ -19,7 +19,7 @@
             android:text="Set Goal"
             style="@style/TextAppearance.AppTitle"
             android:gravity="center"
-            android:background="@color/appTitleBackground"
+            android:background="@color/windowBackgroundColor"
             android:padding="16dp" />
 
         <!-- Goal Input -->

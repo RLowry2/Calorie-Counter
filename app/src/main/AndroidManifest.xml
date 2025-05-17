@@ -41,7 +41,7 @@
             android:exported="true">
         </activity>
         <activity
-            android:name=".ExercisesActivity"
+            android:name=".ExerciseActivity"
             android:exported="true">
         </activity>
         <activity android:name=".ExerciseNamesActivity"

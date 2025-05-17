@@ -14,28 +14,31 @@
         android:textSize="16sp"
         android:paddingBottom="8dp" />
 
-    <Spinner
-        android:id="@+id/exerciseNameSpinner"
+    <!-- AutoCompleteTextView for searching exercises -->
+    <AutoCompleteTextView
+        android:id="@+id/exercise_name_autocomplete"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:hint="Search Exercise"
+        android:inputType="text"
+        android:completionThreshold="1" />
 
-    <!-- Sets Input -->
+    <!-- Number of Sets -->
     <EditText
         android:id="@+id/setsInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Sets"
-        android:inputType="number"
-        android:paddingTop="16dp" />
+        android:hint="Number of Sets"
+        android:inputType="number" />
 
-    <!-- Reps Input -->
+    <!-- Number of Reps -->
     <EditText
         android:id="@+id/repsInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Reps"
-        android:inputType="number"
-        android:paddingTop="8dp" />
+        android:hint="Number of Reps"
+        android:inputType="number" />
+
 
     <!-- Action Buttons -->
     <LinearLayout

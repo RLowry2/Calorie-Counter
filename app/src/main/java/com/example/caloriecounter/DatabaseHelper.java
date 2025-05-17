@@ -13,7 +13,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "calorie_counter.db";
-    private static final int DATABASE_VERSION = 4; // Increment this when schema changes
+    private static final int DATABASE_VERSION = 5; // Incremented for schema changes
 
     // Common Columns
     private static final String COL_ID = "id";
@@ -35,6 +35,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COL_EXERCISE_NAME = "exercise_name";
     private static final String COL_SETS = "sets";
     private static final String COL_REPS = "reps";
+    private static final String COL_WEIGHT = "weight"; // New column for weight
+    private static final String COL_UNIT = "unit"; // New column for unit (lbs or kgs)
 
     // Exercise Names Table
     private static final String EXERCISE_NAMES_TBL = "exercise_names_table";
@@ -66,7 +68,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_DAY + " TEXT NOT NULL, "
                 + COL_EXERCISE_NAME + " TEXT NOT NULL, "
                 + COL_SETS + " INTEGER NOT NULL, "
-                + COL_REPS + " INTEGER NOT NULL)");
+                + COL_REPS + " INTEGER NOT NULL, "
+                + COL_WEIGHT + " REAL DEFAULT 0, " // Default weight to 0
+                + COL_UNIT + " TEXT DEFAULT 'lbs'" // Default unit to lbs
+                + ")");
 
         // Create Exercise Names Table
         db.execSQL("CREATE TABLE " + EXERCISE_NAMES_TBL + " ("
@@ -80,14 +85,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.d("FoodDatabaseHelper", "onUpgrade: Upgrading database from version " + oldVersion + " to " + newVersion);
 
-        // Drop existing tables
-        db.execSQL("DROP TABLE IF EXISTS " + FOOD_TBL);
-        db.execSQL("DROP TABLE IF EXISTS " + GOALS_TBL);
-        db.execSQL("DROP TABLE IF EXISTS " + ROUTINES_TBL);
-        db.execSQL("DROP TABLE IF EXISTS " + EXERCISE_NAMES_TBL);
-
-        // Recreate tables
-        onCreate(db);
+        if (oldVersion < 5) {
+            // Add columns for weight and unit if upgrading to version 5
+            db.execSQL("ALTER TABLE " + ROUTINES_TBL + " ADD COLUMN " + COL_WEIGHT + " REAL DEFAULT 0");
+            db.execSQL("ALTER TABLE " + ROUTINES_TBL + " ADD COLUMN " + COL_UNIT + " TEXT DEFAULT 'lbs'");
+        }
     }
 
     // ** FOOD ENTRIES METHODS **
@@ -158,22 +160,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return goal;
     }
 
-    public void propagateGoalToFutureDate(String currentDate, String futureDate) {
-        int currentGoal = getGoalForDate(currentDate);
-        if (currentGoal > 0 && getGoalForDate(futureDate) == 0) {
-            setGoalForDate(futureDate, currentGoal);
-        }
-    }
-
     // ** EXERCISE ROUTINES METHODS **
 
-    public boolean addExerciseToDay(String day, String exerciseName, int sets, int reps) {
+    public boolean addExerciseToDay(String day, String exerciseName, int sets, int reps, double weight, String unit) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COL_DAY, day);
         values.put(COL_EXERCISE_NAME, exerciseName);
         values.put(COL_SETS, sets);
         values.put(COL_REPS, reps);
+        values.put(COL_WEIGHT, weight);
+        values.put(COL_UNIT, unit);
 
         int updated = db.update(ROUTINES_TBL, values, COL_DAY + " = ? AND " + COL_EXERCISE_NAME + " = ?", new String[]{day, exerciseName});
         if (updated == 0) {
@@ -187,23 +184,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public List<ExerciseEntry> getExercisesForDay(String day) {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(ROUTINES_TBL,
-                new String[]{COL_EXERCISE_NAME, COL_SETS, COL_REPS},
-                COL_DAY + " = ?", new String[]{day},
-                null, null, null);
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<ExerciseEntry> exercises = new ArrayList<>();
 
-        List<ExerciseEntry> routines = new ArrayList<>();
-        while (cursor.moveToNext()) {
-            routines.add(new ExerciseEntry(
-                    cursor.getString(cursor.getColumnIndexOrThrow(COL_EXERCISE_NAME)),
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COL_SETS)),
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COL_REPS))
-            ));
+        // Query to fetch exercises for the specified day
+        String query = "SELECT * FROM " + ROUTINES_TBL + " WHERE " + COL_DAY + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{day});
+
+        if (cursor.moveToFirst()) {
+            do {
+                String name = cursor.getString(cursor.getColumnIndexOrThrow(COL_EXERCISE_NAME));
+                int sets = cursor.getInt(cursor.getColumnIndexOrThrow(COL_SETS));
+                int reps = cursor.getInt(cursor.getColumnIndexOrThrow(COL_REPS));
+                double weight = cursor.getDouble(cursor.getColumnIndexOrThrow(COL_WEIGHT));
+                String unit = cursor.getString(cursor.getColumnIndexOrThrow(COL_UNIT));
+
+                exercises.add(new ExerciseEntry(name, sets, reps, weight, unit));
+            } while (cursor.moveToNext());
         }
+
         cursor.close();
         db.close();
-        return routines;
+
+        return exercises;
+    }
+
+    public boolean updateExerciseWeightAndUnit(int id, double weight, String unit) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_WEIGHT, weight);
+        values.put(COL_UNIT, unit);
+
+        int updated = db.update(ROUTINES_TBL, values, COL_ID + " = ?", new String[]{String.valueOf(id)});
+        db.close();
+        return updated > 0;
     }
 
     public int clearExercisesForDay(String day) {
@@ -245,7 +259,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(COL_EXERCISE_NAME, newName);
 
-        // Update the exercise name where the old name matches
         int rowsAffected = db.update(EXERCISE_NAMES_TBL, values, COL_EXERCISE_NAME + " = ?", new String[]{oldName});
         db.close();
 
@@ -254,11 +267,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean deleteExerciseName(String exerciseName) {
         SQLiteDatabase db = getWritableDatabase();
-
-        // Delete the exercise where the name matches
         int rowsAffected = db.delete(EXERCISE_NAMES_TBL, COL_EXERCISE_NAME + " = ?", new String[]{exerciseName});
         db.close();
 
         return rowsAffected > 0;
+    }
+
+    public boolean deleteExercise(ExerciseEntry exercise) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Define the where clause and arguments
+        String whereClause = COL_EXERCISE_NAME + " = ? AND " + COL_DAY + " = ?";
+        String[] whereArgs = {exercise.getName(), exercise.getDay()};
+
+        // Attempt to delete the exercise
+        int rowsAffected = db.delete(ROUTINES_TBL, whereClause, whereArgs);
+
+        // Close the database
+        db.close();
+
+        // Return true if at least one row was deleted
+        return rowsAffected > 0;
+    }
+
+    public void propagateGoalToFutureDate(String currentDate, String futureDate) {
+        int currentGoal = getGoalForDate(currentDate);
+        if (currentGoal > 0 && getGoalForDate(futureDate) == 0) {
+            setGoalForDate(futureDate, currentGoal);
+        }
     }
 }

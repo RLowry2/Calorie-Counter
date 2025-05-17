@@ -32,59 +32,55 @@
         android:id="@+id/exerciseSetsReps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="3 Sets x 10 Reps"
+        android:text=""
         android:textSize="14sp"
         android:paddingStart="40dp"
         android:paddingTop="4dp"
         android:textColor="#555555" />
 
-    <!-- Set Level -->
+    <!-- Dynamic Set Checkboxes -->
     <LinearLayout
+        android:id="@+id/setsContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingStart="24dp">
 
-        <!-- Set 1 -->
+        <!-- Example for One Set -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:paddingTop="8dp">
 
-            <CheckBox
-                android:id="@+id/setCheckbox1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            <!-- Weight Input -->
+            <EditText
+                android:id="@+id/weightInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Weight"
+                android:inputType="numberDecimal"
+                android:padding="8dp"
+                android:background="@android:drawable/edit_text"
+                android:textSize="14sp" />
 
-            <TextView
-                android:id="@+id/setName1"
+            <!-- Unit Selector -->
+            <Spinner
+                android:id="@+id/unitSpinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Set 1"
-                android:textSize="14sp"
-                android:paddingStart="8dp" />
-        </LinearLayout>
+                android:layout_marginStart="8dp"
+                android:padding="8dp" />
 
-        <!-- Set 2 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
+            <!-- Set Checkbox -->
             <CheckBox
-                android:id="@+id/setCheckbox2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/setName2"
+                android:id="@+id/setCheckbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Set 2"
-                android:textSize="14sp"
-                android:paddingStart="8dp" />
+                android:layout_marginStart="16dp" />
         </LinearLayout>
+
     </LinearLayout>
 </LinearLayout>
