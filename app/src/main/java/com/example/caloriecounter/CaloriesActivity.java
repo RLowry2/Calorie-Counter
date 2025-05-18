@@ -28,8 +28,10 @@ public class CaloriesActivity extends AppCompatActivity {
     private FoodAdapter adapter;
     private List<FoodEntry> foodList;
     private TextView todaysDate;
+    private TextView totalCaloriesText;
+    private TextView goalText;
 
-    // Launcher for AddEntryActivity:
+    // Launcher for AddEntryActivity
     private final ActivityResultLauncher<Intent> addEntryLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK) {
@@ -37,7 +39,7 @@ public class CaloriesActivity extends AppCompatActivity {
                 }
             });
 
-    // Launcher for CalendarActivity:
+    // Launcher for CalendarActivity
     private final ActivityResultLauncher<Intent> calendarLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK) {
@@ -45,7 +47,7 @@ public class CaloriesActivity extends AppCompatActivity {
                 }
             });
 
-    // Launcher for SetGoalActivity:
+    // Launcher for SetGoalActivity
     private final ActivityResultLauncher<Intent> setGoalLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK) {
@@ -56,7 +58,7 @@ public class CaloriesActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_calories); // Reuse the original layout
+        setContentView(R.layout.activity_calories);
 
         // Hide the status bar
         getWindow().setFlags(
@@ -64,21 +66,33 @@ public class CaloriesActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN
         );
 
+        // Initialize views
         foodRecyclerView = findViewById(R.id.foodRecyclerView);
         foodRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         foodList = new ArrayList<>();
-        adapter = new FoodAdapter(foodList, this::onDeleteButtonClicked);
+        adapter = new FoodAdapter(foodList, this::onDeleteButtonClicked, this::onDataChanged);
         foodRecyclerView.setAdapter(adapter);
 
-        // Today's date
         todaysDate = findViewById(R.id.todaysDate);
+        totalCaloriesText = findViewById(R.id.totalCaloriesText);
+        if (totalCaloriesText == null) {
+            Log.e("CaloriesActivity", "View not found: totalCaloriesText");
+        }
+        goalText = findViewById(R.id.goalText);
+
+        FloatingActionButton fabMenu = findViewById(R.id.fabAdd);
+        fabMenu.setOnClickListener(this::showPopupMenu);
+
+        // Set today's date
         String currentDate = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()).format(new Date());
         todaysDate.setText(currentDate);
 
-        // FAB menu
-        FloatingActionButton fabMenu = findViewById(R.id.fabMenu);
-        fabMenu.setOnClickListener(this::showPopupMenu);
+        // Load food data
+        loadFoods();
+    }
 
+    private void onDataChanged() {
+        // Reload data when notified of changes
         loadFoods();
     }
 
@@ -109,51 +123,56 @@ public class CaloriesActivity extends AppCompatActivity {
     private void loadFoods() {
         DatabaseHelper db = new DatabaseHelper(this);
         String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-        String selectedDate = today; // Assuming today is the default
 
-        // Propagate today's goal to the selected date if it's in the future
-        if (selectedDate.compareTo(today) > 0) {
-            db.propagateGoalToFutureDate(today, selectedDate);
-        }
-
+        // Fetch food entries from the database
         foodList.clear();
-        foodList.addAll(db.getFoodEntriesForDate(selectedDate));
-
-        int total = 0;
-        for (FoodEntry e : foodList) total += e.getCalories();
-
-        int goal = db.getGoalForDate(selectedDate);
-        TextView totalTxt = findViewById(R.id.totalCaloriesText);
-        totalTxt.setText("Total Calories: " + total + "/" + goal);
-
-        if (goal > 0) {
-            double pct = (double) total / goal;
-            totalTxt.setTextColor(getColorForPercentage(pct));
-        }
-
+        foodList.addAll(db.getFoodEntriesForDate(today));
         adapter.notifyDataSetChanged();
+
+        // Calculate total calories
+        int totalCalories = 0;
+        for (FoodEntry food : foodList) {
+            totalCalories += food.getCalories(); // Ensure getCalories() returns the correct value
+        }
+        totalCaloriesText.setText("Total Calories: " + totalCalories);
+
+        // Fetch and display the goal
+        int goal = db.getGoalForDate(today);
+        goalText.setText("Goal: " + goal);
+
+        // Update text color based on goal percentage
+        if (goal > 0) {
+            double percentage = (double) totalCalories / goal;
+            totalCaloriesText.setTextColor(getColorForPercentage(percentage));
+        }
     }
 
     private int getColorForPercentage(double percentage) {
         if (percentage > 1) return getResources().getColor(android.R.color.holo_red_dark);
-        if (percentage >= .7) return getResources().getColor(android.R.color.holo_green_dark);
+        if (percentage >= 0.7) return getResources().getColor(android.R.color.holo_green_dark);
         return getResources().getColor(android.R.color.holo_orange_dark);
     }
 
     private void openSetGoalActivity() {
         Intent intent = new Intent(this, SetGoalActivity.class);
         String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-        intent.putExtra("selectedDate", today); // Pass today's date to the activity
+        intent.putExtra("selectedDate", today);
 
         // Log the intent data for debugging
         Log.d("CaloriesActivity", "Launching SetGoalActivity with date: " + today);
 
-        // Launch the activity using the ActivityResultLauncher
         setGoalLauncher.launch(intent);
     }
 
-    private void onDeleteButtonClicked(FoodEntry entry, int pos) {
-        new DatabaseHelper(this).deleteFood(entry.getId());
+    private void onDeleteButtonClicked(FoodEntry entry, int position) {
+        DatabaseHelper db = new DatabaseHelper(this);
+        db.deleteFood(entry.getId());
         loadFoods();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadFoods(); // Reload data when returning to the activity
     }
 }

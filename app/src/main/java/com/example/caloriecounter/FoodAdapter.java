@@ -1,6 +1,7 @@
 package com.example.caloriecounter;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,16 +16,24 @@ import java.util.List;
 
 public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder> {
 
+    // Interface for delete event
     public interface OnDeleteListener {
         void onDelete(FoodEntry foodEntry, int position);
     }
 
+    // Interface for notifying data changes
+    public interface OnDataChangedListener {
+        void onDataChanged();
+    }
+
     private List<FoodEntry> foodList;
     private OnDeleteListener deleteListener;
+    private OnDataChangedListener dataChangedListener;
 
-    public FoodAdapter(List<FoodEntry> foodList, OnDeleteListener deleteListener) {
+    public FoodAdapter(List<FoodEntry> foodList, OnDeleteListener deleteListener, OnDataChangedListener dataChangedListener) {
         this.foodList = foodList;
         this.deleteListener = deleteListener;
+        this.dataChangedListener = dataChangedListener;
     }
 
     @NonNull
@@ -54,14 +63,16 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
     }
 
     private void showEditDialog(View view, FoodEntry food, int position) {
-        View dialogView = LayoutInflater.from(view.getContext()).inflate(R.layout.dialog_edit_food, null);
+        Context context = view.getContext();
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_edit_food, null);
+
         EditText editName = dialogView.findViewById(R.id.editFoodName);
         EditText editCalories = dialogView.findViewById(R.id.editFoodCalories);
 
         editName.setText(food.getName());
         editCalories.setText(String.valueOf(food.getCalories()));
 
-        AlertDialog dialog = new AlertDialog.Builder(view.getContext())
+        AlertDialog dialog = new AlertDialog.Builder(context)
                 .setView(dialogView)
                 .setCancelable(false)
                 .setPositiveButton("Submit", null) // Overriding below
@@ -90,8 +101,18 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
             int newCalories = Integer.parseInt(newCaloriesStr);
             food.setName(newName);
             food.setCalories(newCalories);
-            notifyItemChanged(position);
+
+            // Save changes to the database
+            DatabaseHelper db = new DatabaseHelper(dialog.getContext());
+            db.updateFood(food);
+
+            notifyItemChanged(position); // Update the RecyclerView
             dialog.dismiss();
+
+            // Notify the activity to reload the data
+            if (dataChangedListener != null) {
+                dataChangedListener.onDataChanged();
+            }
         } catch (NumberFormatException e) {
             Toast.makeText(dialog.getContext(), "Calories must be a number", Toast.LENGTH_SHORT).show();
         }
@@ -112,7 +133,6 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         return foodList.get(position);
     }
 
-    // Method to update the food list in the adapter
     public void updateFoodList(List<FoodEntry> newFoodList) {
         this.foodList = newFoodList;
         notifyDataSetChanged();

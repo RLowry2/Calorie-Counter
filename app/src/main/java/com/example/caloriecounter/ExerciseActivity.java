@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.PopupMenu;
@@ -42,6 +44,12 @@ public class ExerciseActivity extends AppCompatActivity implements ExerciseAdapt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercises);
+
+        // Hide the status bar
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+        );
 
         Log.d(TAG, "onCreate: Initializing ExercisesActivity");
 
@@ -127,7 +135,17 @@ public class ExerciseActivity extends AppCompatActivity implements ExerciseAdapt
         Log.d(TAG, "loadExercisesForToday: Loading exercises for " + day);
         exerciseList.clear();
         exerciseList.addAll(dbHelper.getExercisesForDay(day)); // Fetch exercises for the day
-        adapter.notifyDataSetChanged();
+        Log.d(TAG, "loadExercisesForToday: Exercise list size = " + exerciseList.size());
+
+        // Toggle the visibility of the "no exercises" message
+        LinearLayout noExercisesLayout = findViewById(R.id.noExercisesLayout); // The parent LinearLayout
+        if (exerciseList.isEmpty()) {
+            noExercisesLayout.setVisibility(View.VISIBLE); // Show "no exercises" message
+        } else {
+            noExercisesLayout.setVisibility(View.GONE); // Hide "no exercises" message
+        }
+
+        adapter.notifyDataSetChanged(); // Refresh RecyclerView
     }
 
     private void showAddExerciseDialog(String currentDay) {

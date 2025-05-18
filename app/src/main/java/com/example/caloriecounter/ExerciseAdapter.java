@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -22,15 +23,16 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
 
     private final List<ExerciseEntry> exerciseList;
     private final OnExerciseLongClickListener longClickListener;
-    private final HashMap<Integer, String[]> setWeightsMap; // To store weights for each set
-    private final HashMap<Integer, String[]> setUnitsMap;   // To store units for each set
+    private final HashMap<Integer, String[]> setWeightsMap; // Stores weights for each set
+    private final HashMap<Integer, String[]> setUnitsMap;   // Stores units for each set
+    private final HashMap<Integer, Boolean[]> setCheckedMap; // Stores checkbox state for each set
 
-    // Constructor with the long click listener
     public ExerciseAdapter(List<ExerciseEntry> exerciseList, OnExerciseLongClickListener longClickListener) {
         this.exerciseList = exerciseList;
         this.longClickListener = longClickListener;
         this.setWeightsMap = new HashMap<>();
         this.setUnitsMap = new HashMap<>();
+        this.setCheckedMap = new HashMap<>();
     }
 
     @NonNull
@@ -47,47 +49,76 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
         // Set exercise name
         holder.exerciseName.setText(exercise.getName());
 
-        // Dynamically set the total sets and reps
+        // Set total sets and reps
         String setsRepsText = exercise.getTotalSets() + " Sets x " + exercise.getRepsPerSet() + " Reps";
         holder.exerciseSetsReps.setText(setsRepsText);
 
-        // Initialize the weights and units arrays for the exercise if not already done
-        if (!setWeightsMap.containsKey(position)) {
-            String[] initialWeights = new String[exercise.getTotalSets()];
-            String[] initialUnits = new String[exercise.getTotalSets()];
-            for (int i = 0; i < initialWeights.length; i++) {
-                initialWeights[i] = String.valueOf(exercise.getWeight()); // Default weight
-                initialUnits[i] = exercise.getUnit(); // Default unit
+        // Handle long-click events
+        holder.itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) {
+                longClickListener.onExerciseLongClicked(position);
+                return true;
             }
-            setWeightsMap.put(position, initialWeights);
-            setUnitsMap.put(position, initialUnits);
+            return false;
+        });
+
+        // Initialize the weights, units, and checkbox states for the exercise
+        if (!setWeightsMap.containsKey(position)) {
+            int totalSets = exercise.getTotalSets();
+            String[] weights = new String[totalSets];
+            String[] units = new String[totalSets];
+            Boolean[] checkedStates = new Boolean[totalSets];
+            for (int i = 0; i < totalSets; i++) {
+                weights[i] = String.valueOf(exercise.getWeight()); // Default weight
+                units[i] = "lbs"; // Default to lbs
+                checkedStates[i] = false; // Default to unchecked
+            }
+            setWeightsMap.put(position, weights);
+            setUnitsMap.put(position, units);
+            setCheckedMap.put(position, checkedStates);
         }
 
         // Clear any existing views in the sets container (to handle recycling)
         holder.setsContainer.removeAllViews();
 
-        // Dynamically add checkboxes, editable weight inputs, and spinners for each set
+        // Dynamically add a checkbox, weight input, and unit spinner for each set
         String[] weightsForExercise = setWeightsMap.get(position);
         String[] unitsForExercise = setUnitsMap.get(position);
+        Boolean[] checkedStatesForExercise = setCheckedMap.get(position);
         for (int i = 0; i < exercise.getTotalSets(); i++) {
             // Create a layout to hold the checkbox, weight input, and spinner
             LinearLayout setLayout = new LinearLayout(holder.setsContainer.getContext());
             setLayout.setOrientation(LinearLayout.HORIZONTAL);
+            setLayout.setPadding(0, 24, 0, 24); // Add vertical padding between rows
 
-            // Create the checkbox for the set
+            // Create the checkbox
             CheckBox setCheckbox = new CheckBox(holder.setsContainer.getContext());
             setCheckbox.setText("Set " + (i + 1));
-            setCheckbox.setChecked(false); // Default to unchecked
+            setCheckbox.setChecked(checkedStatesForExercise[i]);
 
-            // Create the editable weight input
+            // Listener to update the checkbox state
+            int finalI = i;
+            setCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                checkedStatesForExercise[finalI] = isChecked;
+            });
+
+            // Create the weight input
             EditText weightInput = new EditText(holder.setsContainer.getContext());
             weightInput.setText(weightsForExercise[i]);
-            weightInput.setHint("Enter weight");
-            weightInput.setInputType(android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-            weightInput.setPadding(16, 0, 16, 0);
+            weightInput.setHint("Weight");
+            weightInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            weightInput.setBackground(holder.setsContainer.getContext().getResources().getDrawable(R.drawable.edit_text_box));
+            weightInput.setPadding(16, 8, 16, 8);
+
+            // Add margin between checkbox and weight input
+            LinearLayout.LayoutParams weightParams = new LinearLayout.LayoutParams(
+                    200,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            weightParams.setMarginStart(32); // Add horizontal margin
+            weightInput.setLayoutParams(weightParams);
 
             // Listener to update the weight in the map
-            int finalI = i;
             weightInput.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -101,14 +132,29 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
                 public void afterTextChanged(Editable s) {}
             });
 
-            // Create the spinner for the unit selector
+            // Create the spinner for unit selection
             Spinner unitSpinner = new Spinner(holder.setsContainer.getContext());
-            unitSpinner.setAdapter(new android.widget.ArrayAdapter<>(
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                     holder.setsContainer.getContext(),
-                    android.R.layout.simple_spinner_dropdown_item,
-                    holder.setsContainer.getResources().getStringArray(R.array.weight_units)
-            ));
-            unitSpinner.setSelection(unitsForExercise[finalI].equals("kg") ? 1 : 0); // Default to lbs
+                    R.array.weight_units,
+                    android.R.layout.simple_spinner_item
+            );
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            unitSpinner.setAdapter(adapter);
+
+            // Set the initial value for spinner
+            int initialPosition = "kg".equals(unitsForExercise[i]) ? 1 : 0;
+            unitSpinner.setSelection(initialPosition);
+
+            // Add margin between weight input and spinner
+            LinearLayout.LayoutParams spinnerParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            spinnerParams.setMarginStart(32); // Add horizontal margin
+            unitSpinner.setLayoutParams(spinnerParams);
+
+            // Listener to update the unit in the map
             unitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -127,32 +173,6 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
             // Add the set layout to the sets container
             holder.setsContainer.addView(setLayout);
         }
-
-        // Listener for parent checkbox (exercise)
-        holder.exerciseCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            // If parent checkbox is checked, mark all sets as complete
-            for (int i = 0; i < holder.setsContainer.getChildCount(); i++) {
-                View child = holder.setsContainer.getChildAt(i);
-                if (child instanceof LinearLayout) {
-                    LinearLayout childLayout = (LinearLayout) child;
-                    for (int j = 0; j < childLayout.getChildCount(); j++) {
-                        View grandChild = childLayout.getChildAt(j);
-                        if (grandChild instanceof CheckBox) {
-                            ((CheckBox) grandChild).setChecked(isChecked);
-                        }
-                    }
-                }
-            }
-        });
-
-        // Long press to delete the exercise
-        holder.itemView.setOnLongClickListener(v -> {
-            if (longClickListener != null) {
-                longClickListener.onExerciseLongClicked(position);
-                return true;
-            }
-            return false;
-        });
     }
 
     @Override
@@ -163,19 +183,17 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
     public static class ExerciseViewHolder extends RecyclerView.ViewHolder {
         TextView exerciseName;
         TextView exerciseSetsReps;
-        CheckBox exerciseCheckbox;
         LinearLayout setsContainer;
 
         public ExerciseViewHolder(@NonNull View itemView) {
             super(itemView);
             exerciseName = itemView.findViewById(R.id.exerciseName);
             exerciseSetsReps = itemView.findViewById(R.id.exerciseSetsReps);
-            exerciseCheckbox = itemView.findViewById(R.id.exerciseCheckbox);
             setsContainer = itemView.findViewById(R.id.setsContainer);
         }
     }
 
-    // Callback interface for long click
+    // Define the interface for long-click handling
     public interface OnExerciseLongClickListener {
         void onExerciseLongClicked(int position);
     }

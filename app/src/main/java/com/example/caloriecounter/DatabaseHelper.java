@@ -1,5 +1,7 @@
 package com.example.caloriecounter;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -93,6 +95,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // ** FOOD ENTRIES METHODS **
+
+    public void updateFood(FoodEntry food) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("name", food.getName());
+        values.put("calories", food.getCalories());
+
+        db.update(FOOD_TBL, values, "id = ?", new String[]{String.valueOf(food.getId())});
+        db.close();
+    }
 
     public void insertFood(String name, int cal, String date) {
         SQLiteDatabase db = getWritableDatabase();
@@ -191,6 +203,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + ROUTINES_TBL + " WHERE " + COL_DAY + " = ?";
         Cursor cursor = db.rawQuery(query, new String[]{day});
 
+        Log.d(TAG, "getExercisesForDay: Query executed for day = " + day);
+
         if (cursor.moveToFirst()) {
             do {
                 String name = cursor.getString(cursor.getColumnIndexOrThrow(COL_EXERCISE_NAME));
@@ -199,8 +213,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 double weight = cursor.getDouble(cursor.getColumnIndexOrThrow(COL_WEIGHT));
                 String unit = cursor.getString(cursor.getColumnIndexOrThrow(COL_UNIT));
 
+                Log.d(TAG, "getExercisesForDay: Retrieved exercise - " + name);
                 exercises.add(new ExerciseEntry(name, sets, reps, weight, unit));
             } while (cursor.moveToNext());
+        } else {
+            Log.d(TAG, "getExercisesForDay: No exercises found for day = " + day);
         }
 
         cursor.close();

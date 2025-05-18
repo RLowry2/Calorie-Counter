@@ -1,67 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
 
-    <!-- Main Content in a LinearLayout -->
-    <LinearLayout
+    <!-- Date and Add Entry Button -->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <!-- App Title -->
-        <TextView
-            android:id="@+id/appTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Calorie Counter"
-            style="@style/TextAppearance.AppTitle"
-            android:gravity="center"
-            android:background="@color/windowBackgroundColor"
-            android:padding="16dp" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
 
         <!-- Today's Date -->
         <TextView
             android:id="@+id/todaysDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="January 01, 2025"
-            style="@style/TextAppearance.CalorieCounter.Subtitle"
-            android:gravity="center"
-            android:layout_marginTop="8dp"
-            android:layout_gravity="center_horizontal" />
+            android:text="April 24, 2024"
+            android:textSize="24sp"
+            android:textColor="@color/colorPrimary"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:textStyle="bold" />
 
-        <!-- Total Calories for the Date -->
-        <TextView
-            android:id="@+id/totalCaloriesText"
+        <!-- Floating Action Button for Adding Entry -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Total Calories: 0"
-            style="@style/TextAppearance.CalorieCounter.Body"
-            android:gravity="center"
-            android:layout_marginTop="8dp"
-            android:layout_gravity="center_horizontal" />
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="Add Food"
+            app:backgroundTint="@color/colorPrimary"
+            app:tint="@android:color/white"
+            android:src="@drawable/ic_add" />
+    </RelativeLayout>
 
-        <!-- RecyclerView for food entries -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/foodRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:contentDescription="List of food entries" />
-    </LinearLayout>
-
-    <!-- Floating Action Button (FAB) for the menu -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabMenu"
+    <!-- Total Calories Text -->
+    <TextView
+        android:id="@+id/totalCaloriesText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="24dp"
-        android:src="@drawable/ic_menu"
-        android:contentDescription="More options"
-        android:backgroundTint="@color/colorPrimary"
-        android:tint="@android:color/white" />
-</FrameLayout>
+        android:text="Total Calories: 640"
+        android:textSize="18sp"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginBottom="16dp"
+        android:textStyle="bold" />
+
+    <!-- RecyclerView for Food Entries -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/foodRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
+
+    <!-- Goal Section -->
+    <TextView
+        android:id="@+id/goalText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Goal: 1800"
+        android:textSize="18sp"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="start"
+        android:textStyle="bold" />
+</LinearLayout>

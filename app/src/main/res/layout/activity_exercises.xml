@@ -12,60 +12,86 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Title -->
+        <!-- App Title -->
         <TextView
+            android:id="@+id/appTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Exercises"
-            android:textSize="24sp"
-            android:textStyle="bold"
+            style="@style/TextAppearance.AppTitle"
             android:gravity="center"
-            android:paddingBottom="8dp" />
+            android:background="@color/windowBackgroundColor"
+            android:padding="16dp" />
 
         <!-- Day Navigation -->
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:layout_marginTop="8dp"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="8dp">
 
-            <ImageButton
-                android:id="@+id/previousDayButton"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_previous"
-                android:contentDescription="Previous Day"
-                android:background="?attr/selectableItemBackground" />
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:padding="8dp">
 
-            <TextView
-                android:id="@+id/currentDayText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Monday"
-                android:textSize="18sp"
-                android:paddingHorizontal="16dp"
-                android:gravity="center" />
+                <ImageButton
+                    android:id="@+id/previousDayButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_previous"
+                    android:contentDescription="Previous Day"
+                    android:background="?attr/selectableItemBackground" />
 
-            <ImageButton
-                android:id="@+id/nextDayButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_next"
-                android:contentDescription="Next Day"
-                android:background="?attr/selectableItemBackground" />
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/currentDayText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Monday"
+                    android:textSize="18sp"
+                    android:gravity="center"
+                    android:paddingHorizontal="16dp" />
+
+                <ImageButton
+                    android:id="@+id/nextDayButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_next"
+                    android:contentDescription="Next Day"
+                    android:background="?attr/selectableItemBackground" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Message for No Exercises -->
-        <TextView
-            android:id="@+id/noExercisesText"
+        <LinearLayout
+            android:id="@+id/noExercisesLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No exercises scheduled for today!"
-            android:textSize="16sp"
+            android:orientation="vertical"
             android:gravity="center"
-            android:textColor="#808080"
-            android:visibility="gone"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp">
+
+            <ImageView
+                android:id="@+id/noExercisesIcon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_no_exercises"
+                android:tint="@color/colorPrimary"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/noExercisesText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No exercises scheduled for today!"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:textColor="#808080"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
 
         <!-- RecyclerView for Exercises -->
         <androidx.recyclerview.widget.RecyclerView
@@ -75,16 +101,6 @@
             android:layout_weight="1"
             android:paddingTop="16dp" />
 
-        <!-- Weight Display -->
-        <TextView
-            android:id="@+id/weightDisplay"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Weight: 0 lbs"
-            android:textSize="16sp"
-            android:gravity="center"
-            android:textColor="#000000"
-            android:layout_marginTop="8dp" />
     </LinearLayout>
 
     <!-- Floating Action Button -->

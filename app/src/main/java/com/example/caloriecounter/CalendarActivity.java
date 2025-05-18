@@ -67,12 +67,12 @@ public class CalendarActivity extends AppCompatActivity {
         // RecyclerView + adapter, with delete callback:
         foodRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         foodList = new ArrayList<>();
-        adapter = new FoodAdapter(foodList, (foodEntry, position) -> {
-            // Delete from DB + refresh UI + bubble result
-            new DatabaseHelper(this).deleteFood(foodEntry.getId());
-            updateUIForSelectedDate(selectedDate);
-            setResult(RESULT_OK);
-        });
+        // Initialize the adapter with all required parameters
+        adapter = new FoodAdapter(
+                foodList,
+                (foodEntry, position) -> onDeleteButtonClicked(foodEntry, position), // OnDeleteListener
+                this::onDataChanged // OnDataChangedListener
+        );
         foodRecyclerView.setAdapter(adapter);
 
         // Default date = today:
@@ -89,6 +89,46 @@ public class CalendarActivity extends AppCompatActivity {
         // FAB menu:
         FloatingActionButton fabMenu = findViewById(R.id.fabMenu);
         fabMenu.setOnClickListener(v -> showPopupMenu(v));
+    }
+
+    // Called when an item is deleted
+    private void onDeleteButtonClicked(FoodEntry foodEntry, int position) {
+        DatabaseHelper db = new DatabaseHelper(this);
+        db.deleteFood(foodEntry.getId());
+        loadFoods(); // Reload the data after deletion
+    }
+
+    // Called when an item is edited
+    private void onDataChanged() {
+        loadFoods(); // Reload the data after an edit
+    }
+
+    private void loadFoods() {
+        DatabaseHelper db = new DatabaseHelper(this);
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        String selectedDate = today; // Assuming today is the default
+
+        // Propagate today's goal to the selected date if it's in the future
+        if (selectedDate.compareTo(today) > 0) {
+            db.propagateGoalToFutureDate(today, selectedDate);
+        }
+
+        foodList.clear();
+        foodList.addAll(db.getFoodEntriesForDate(selectedDate));
+
+        int total = 0;
+        for (FoodEntry e : foodList) total += e.getCalories();
+
+        int goal = db.getGoalForDate(selectedDate);
+        TextView totalTxt = findViewById(R.id.totalCaloriesText);
+        totalTxt.setText("Total Calories: " + total + "/" + goal);
+
+        if (goal > 0) {
+            double pct = (double) total / goal;
+            totalTxt.setTextColor(getColorForPercentage(pct));
+        }
+
+        adapter.notifyDataSetChanged();
     }
 
     private void showPopupMenu(View anchor) {

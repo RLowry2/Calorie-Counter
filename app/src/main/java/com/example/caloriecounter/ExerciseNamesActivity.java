@@ -3,6 +3,7 @@ package com.example.caloriecounter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -31,6 +32,12 @@ public class ExerciseNamesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate: Initializing ExerciseNamesActivity");
         setContentView(R.layout.activity_exercise_names);
+
+        // Hide the status bar
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+        );
 
         // Initialize database helper
         dbHelper = new DatabaseHelper(this);
